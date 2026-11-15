@@ -1,0 +1,5 @@
+lightkurve
+batman-package
+setuptools  # batman cần distutils, Python 3.12 đã bỏ nên lấy từ setuptools
+matplotlib
+requests

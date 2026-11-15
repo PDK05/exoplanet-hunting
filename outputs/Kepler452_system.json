@@ -1,0 +1,31 @@
+{
+  "target": "Kepler-452",
+  "star": {
+    "teff": 5578.0,
+    "radius_rsun": 0.794,
+    "mass_msun": 0.8698893746166639,
+    "lum_lsun": 0.5498569957474989,
+    "distance_pc": 553.9367809258006
+  },
+  "planets": [
+    {
+      "name": "Kepler-452 b",
+      "period_days": 384.843,
+      "t0_bkjd": 314.98043413425927,
+      "a_au": 0.9884963136585028,
+      "radius_earth": 1.0255029910815614,
+      "radius_measured": true,
+      "mass_earth": null,
+      "mass_estimate_earth": 1.0636460463165989,
+      "t14_days": 0.42336044177194937,
+      "rp_rs": 0.011827747121994496,
+      "a_rs": 287.23556379383376,
+      "impact_b": 0.1958602819168727,
+      "depth": 0.0001685401857376423,
+      "detection": "verify",
+      "transiting": true,
+      "teq_k": 220.49865830015517,
+      "composition": "Hành tinh đá (chỉ theo bán kính)"
+    }
+  ]
+}

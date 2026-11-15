@@ -1,0 +1,31 @@
+{
+  "target": "Kepler-6",
+  "star": {
+    "teff": 5640.0,
+    "radius_rsun": 1.291,
+    "mass_msun": 1.2067973068278166,
+    "lum_lsun": 1.5193702231443695,
+    "distance_pc": 584.5275863588589
+  },
+  "planets": [
+    {
+      "name": "Kepler-6 b",
+      "period_days": 3.2346897015207183,
+      "t0_bkjd": 121.48852999028671,
+      "a_au": 0.04557547241266736,
+      "radius_earth": 13.121011442782425,
+      "radius_measured": true,
+      "mass_earth": 212.12974279819335,
+      "mass_estimate_earth": 113.5725208953517,
+      "t14_days": 0.1487749857441998,
+      "rp_rs": 0.09307363457962678,
+      "a_rs": 7.59127154883712,
+      "impact_b": 7.1181910537901466e-06,
+      "depth": 0.010490729093215134,
+      "detection": "bls",
+      "transiting": true,
+      "teq_k": 1323.9797804195528,
+      "composition": "Khí khổng lồ H/He, ~21% nguyên tố nặng"
+    }
+  ]
+}

@@ -1,0 +1,69 @@
+{
+  "target": "Kepler-10",
+  "star": {
+    "teff": 5627.0,
+    "radius_rsun": 1.056,
+    "mass_msun": 0.8936158385633998,
+    "lum_lsun": 1.0072336057666769,
+    "distance_pc": 186.2279186097332
+  },
+  "planets": [
+    {
+      "name": "Kepler-10 b",
+      "period_days": 0.8374874249587257,
+      "t0_bkjd": 120.68948312072857,
+      "a_au": 0.016749446761358866,
+      "radius_earth": 1.4257396877763167,
+      "radius_measured": true,
+      "mass_earth": 3.177067125030518,
+      "mass_estimate_earth": 2.622555881435966,
+      "t14_days": 0.07421470785017378,
+      "rp_rs": 0.012364083306685486,
+      "a_rs": 3.6337933638123707,
+      "impact_b": 0.17294992388588898,
+      "depth": 0.00018317114162214043,
+      "detection": "bls",
+      "transiting": true,
+      "teq_k": 1970.6675165539812,
+      "composition": "Đá + sắt, lõi sắt ~13%"
+    },
+    {
+      "name": "Kepler-10 c",
+      "period_days": 45.29421587886044,
+      "t0_bkjd": 138.67845232716095,
+      "a_au": 0.23953929518875677,
+      "radius_earth": 2.1729514593774475,
+      "radius_measured": true,
+      "mass_earth": 11.328729178834065,
+      "mass_estimate_earth": 5.363366318494424,
+      "t14_days": 0.28131856319771403,
+      "rp_rs": 0.018843939812764502,
+      "a_rs": 51.303140249325494,
+      "impact_b": 0.19003123804604652,
+      "depth": 0.000427876859146914,
+      "detection": "bls",
+      "transiting": true,
+      "teq_k": 521.1049609003529,
+      "composition": "Đá + nhiều nước/băng HOẶC khí mỏng"
+    },
+    {
+      "name": "Kepler-10 d",
+      "period_days": 151.06,
+      "t0_bkjd": null,
+      "a_au": 0.5347054251482838,
+      "radius_earth": 3.6577262737660297,
+      "radius_measured": false,
+      "mass_earth": 12.984113222646135,
+      "mass_estimate_earth": null,
+      "t14_days": null,
+      "rp_rs": null,
+      "a_rs": null,
+      "impact_b": null,
+      "depth": null,
+      "detection": null,
+      "transiting": false,
+      "teq_k": 348.78379284114556,
+      "composition": "Không xác định"
+    }
+  ]
+}
