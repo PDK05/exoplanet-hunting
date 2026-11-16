@@ -1,0 +1,44 @@
+{
+ "k2-18b_spectrum_2023": {
+  "file": "Spectra of exoplanet K2-18 b (weic2321b).jpg",
+  "page": "https://commons.wikimedia.org/wiki/File:Spectra_of_exoplanet_K2-18_b_(weic2321b).jpg",
+  "license": "CC BY 4.0",
+  "artist": "NASA, CSA, ESA, J. Olmstead (STScI), N. Madhusudhan (Cambridge University)"
+ },
+ "k2-18b_miri_2025": {
+  "file": "K2-18 b Mid-Infrared Transmission Spectrum.png",
+  "page": "https://commons.wikimedia.org/wiki/File:K2-18_b_Mid-Infrared_Transmission_Spectrum.png",
+  "license": "CC BY 4.0",
+  "artist": "Nikku Madhusudhan et al. 2025"
+ },
+ "lhs1140b_atmosphere": {
+  "file": "First atmosphere detected on a habitable-zone rocky world (LHS 1140 b).jpg",
+  "page": "https://commons.wikimedia.org/wiki/File:First_atmosphere_detected_on_a_habitable-zone_rocky_world_(LHS_1140_b).jpg",
+  "license": "CC0",
+  "artist": "Melissa Weiss/CfA"
+ },
+ "solar_gravitational_lens_point": {
+  "file": "Solar gravitational lense point.jpg",
+  "page": "https://commons.wikimedia.org/wiki/File:Solar_gravitational_lense_point.jpg",
+  "license": "Public domain",
+  "artist": "NASA"
+ },
+ "einstein_ring_horseshoe": {
+  "file": "A Horseshoe Einstein Ring from Hubble.JPG",
+  "page": "https://commons.wikimedia.org/wiki/File:A_Horseshoe_Einstein_Ring_from_Hubble.JPG",
+  "license": "Public domain",
+  "artist": "<ul><li><a href=\"//commons.wikimedia.org/wiki/File:Lensshoe_hubble.jpg\" title=\"File:Lensshoe hubble.jpg\">Lensshoe_hubble.jpg</a>: ESA/Hubble &amp; NASA</li>\n<li>derivative work: <a href=\"//commons.wikimedia.org/wiki/User:Bulwersator\" title=\"User:Bulwersator\">Bulwersator</a> (<a href=\"//commons.wikimedia.org/wiki/User_talk:Bulwersator\" title=\"User talk:Bulwersator\"><span class=\"signature-talk\">talk</span></a>)</li></ul>"
+ },
+ "lightsail_mission_parameters": {
+  "file": "Mission parameters for lightsail mission to Alpha Centauri.webp",
+  "page": "https://commons.wikimedia.org/wiki/File:Mission_parameters_for_lightsail_mission_to_Alpha_Centauri.webp",
+  "license": "CC BY 4.0",
+  "artist": "Authors of the study: Lucas Norder, Shunyu Yin, Matthijs H. J. de Jong, Francesco Stallone, Hande Aydogmus, Paolo M. Sberna, Miguel A. Bessa &amp; Richard A. Norte"
+ },
+ "wasp39b_transit_lightcurves": {
+  "file": "Hot Gas Giant Exoplanet WASP-39 b (NIRSpec Transit Light Curves).png",
+  "page": "https://commons.wikimedia.org/wiki/File:Hot_Gas_Giant_Exoplanet_WASP-39_b_(NIRSpec_Transit_Light_Curves).png",
+  "license": "CC BY 2.0",
+  "artist": "NASA's James Webb Space Telescope"
+ }
+}

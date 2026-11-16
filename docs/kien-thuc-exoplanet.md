@@ -193,6 +193,16 @@ Phần lớn công sức thật sự nằm ở việc loại bỏ những trư�
 | Equilibrium temperature (Teq) | Nhiệt độ cân bằng: nhiệt độ ước tính của hành tinh chỉ do sao mẹ sưởi |
 | Insolation | Lượng bức xạ hành tinh nhận được, so với Trái Đất |
 | Albedo | Tỉ lệ ánh sáng bị phản xạ đi (0 = hấp thụ hết, 1 = phản xạ hết) |
+| Albedo hình học (Ag) | Độ sáng hành tinh nhìn "trăng tròn" so với một đĩa phẳng trắng tuyệt đối cùng kích thước; đo được từ nhật thực phụ |
+| Secondary eclipse (nhật thực phụ) | Hành tinh khuất sau sao (pha 0.5): độ sáng giảm đúng bằng ánh sáng của hành tinh |
+| Phase curve (đường cong pha) | Độ sáng tổng thay đổi theo vị trí quỹ đạo, vì ta thấy dần phía ngày rồi phía đêm của hành tinh |
+| Phổ truyền qua / phổ phát xạ | Độ sâu transit / độ sâu nhật thực phụ đo ở nhiều bước sóng; cho biết khí quyển có phân tử gì |
+| Scale height (độ cao thang, H) | Độ cao mà mật độ khí giảm e lần: H = kT/(μ m_H g). Quyết định khí quyển có "dày" để đo phổ không |
+| TSM / ESM | Chỉ số Kempton 2018 ước lượng SNR khi JWST chụp phổ truyền qua / phát xạ |
+| Brightness temperature | Nhiệt độ của vật đen có cùng độ sáng ở bước sóng đó |
+| Biosignature | Khí có thể do sinh vật tạo ra (O₂, O₃, CH₄ + CO₂, DMS…); phải loại trừ mọi nguồn không sinh học |
+| σ (sigma) | Đơn vị độ tin cậy: 3σ = nhiễu tạo ra 1 lần trong ~740; 5σ = 1 lần trong ~3,5 triệu (chuẩn "phát hiện") |
+| Einstein ring | Vòng sáng khi nguồn sáng, vật làm thấu kính và người quan sát thẳng hàng; cơ sở của thấu kính hấp dẫn Mặt Trời |
 | Radial velocity (RV) | Vận tốc xuyên tâm: sao bị hành tinh kéo nên dao động tới lui; cách để đo khối lượng hành tinh |
 | Semi-amplitude K | Biên độ dao động vận tốc của sao do hành tinh gây ra (m/s) |
 | Metallicity [Fe/H] | Độ kim loại: hàm lượng nguyên tố nặng hơn He so với Mặt Trời, thang log |
@@ -262,6 +272,11 @@ Phần lớn công sức thật sự nằm ở việc loại bỏ những trư�
 | Cadence alias | Dao động giả trong O − C do tâm transit rơi vào vị trí khác nhau trong lưới đo 29.4 phút |
 | Aliasing | Tín hiệu nhanh bị lấy mẫu thưa hiện ra như tín hiệu chậm hơn |
 | Starspot / rotation | Vết đen trên sao quay theo sao, làm độ sáng dao động theo chu kỳ tự quay (vd. Kepler-186 ~35 ngày) |
+| Stellar activity (RV) | Vết trên sao làm vạch phổ dịch đi giống như hành tinh kéo sao; nguyên nhân bác bỏ Gliese 581 g, Kapteyn b, Barnard b (2018) |
+| Window function / alias 1 năm | Lịch quan sát (chỉ ban đêm, theo mùa) tự sinh ra chu kỳ giả trong dữ liệu RV; nguyên nhân bác bỏ Alpha Centauri Bb |
+| Phép thử đường phẳng (flat-line test) | χ² của phổ truyền qua so với một đường nằm ngang; đá trần/mây dày cho phổ phẳng. σ cao chỉ nghĩa là "có cấu trúc", có thể do vết sao hoặc sai số bị đánh giá thấp (xem χ²_red) |
+| χ²_red (chi bình phương rút gọn) | χ² chia số bậc tự do; ≈ 1 khi sai số công bố đúng với độ phân tán thật, ≫ 1 khi có tín hiệu hoặc sai số bị đánh giá thấp |
+| Single-epoch detection | Ứng viên chỉ thấy 1 lần (vd. Alpha Cen A S1 của JWST); cần thấy lại ở vị trí dự đoán mới được xác nhận |
 
 ## 7. Từ transit tính ra được gì?
 
@@ -528,6 +543,39 @@ $$\delta_{v,max} = (\max(D, 0) + 2\sigma_D)\cdot\frac{2\Delta t_{max} + T_{14}}{
 
 Kepler-186 (mục 9 của [`kepler-186.md`](kepler-186.md)): không thấy vệ tinh; f giới hạn ~0.56 M⊕ và 0.84 R⊕. Kepler-186b có đỉnh O − C với FAP 3·10⁻⁴ nhưng chỉ xuất hiện ở nửa sau dữ liệu, nên là nhiễu: luôn **chia đôi dữ liệu** để kiểm tra. Kepler-10c có TTV đã công bố (`ttv_flag = 1` trên NASA) nhưng biên độ chỉ vài phút, dưới độ nhạy của phép đo ở đây (sai số 4.6 phút mỗi transit).
 
+### 7.10. Hệ số tối rìa: phải đúng cho từng ngôi sao
+
+**Tối rìa** (limb darkening): mép đĩa sao trông tối hơn tâm, vì ở mép ta nhìn xiên vào lớp khí phía trên, nguội hơn. Mô hình bậc hai:
+
+$$\frac{I(\mu)}{I(1)} = 1 - u_1(1-\mu) - u_2(1-\mu)^2, \qquad \mu = \cos(\text{góc giữa tia nhìn và pháp tuyến bề mặt sao})$$
+
+Hệ số u₁, u₂ **phụ thuộc sao** (Teff, logg, [Fe/H]) và **bộ lọc** (dải Kepler). Sai hệ số thì hình dạng đáy transit sai, kéo theo Rp/Rs và b sai.
+
+| Sao | Teff | (u₁, u₂) dải Kepler |
+|---|---|---|
+| Kepler-6 | 5.640 K | (0.421, 0.257) |
+| Kepler-10 | 5.676 K | (0.393, 0.268) |
+| Kepler-452 | 5.579 K | (0.434, 0.243) |
+| **Kepler-186** (sao lùn M) | 3.751 K | **(0.241, 0.442)** |
+
+Sao lùn M có hệ số **khác hẳn** sao giống Mặt Trời: u₁ nhỏ hơn, u₂ lớn hơn, nghĩa là tâm đĩa sáng đều hơn nhưng mép tối đi nhanh hơn. Trước đây code dùng chung (0.40, 0.26) cho mọi sao; nay `02_analyze.py` lấy hệ số riêng từ bảng KOI DR25 của NASA (cột `koi_ldm_coeff1`, `koi_ldm_coeff2`; Kepler tính theo bảng Claret cho đúng Teff, logg, [Fe/H] của sao đó). Thay đổi kết quả so với hệ số cũ: xem mục "Hệ số tối rìa" trong tài liệu từng hệ.
+
+### 7.11. Khí quyển hành tinh: những gì đo được từ Kepler
+
+Kepler chỉ có 1 dải màu nên **không tự đo được phổ**, nhưng vẫn đo được 2 thứ liên quan tới khí quyển:
+
+- **Nhật thực phụ** (hành tinh khuất sau sao, ở pha 0.5): độ sâu = ánh sáng hành tinh phản xạ + phát nhiệt. Trong ánh sáng khả kiến chủ yếu là phản xạ, nên ra được **albedo hình học** $A_g = \delta_{ecl}\,(a/R_p)^2$.
+- **Độ cao thang** $H = k_BT/(\mu m_H g)$ và biên độ phổ truyền qua dự kiến $\Delta D \approx 4HR_p/R_s^2$, để biết JWST có đo được không (chỉ số TSM, ESM của Kempton et al. 2018).
+
+Phổ thật theo bước sóng (HST, Spitzer, JWST) lấy từ các bài báo đã công bố trên NASA Exoplanet Archive. Script: `05_atmosphere.py`. Toàn bộ công thức, các tuyên bố "phát hiện sự sống" gần đây (K2-18b, TRAPPIST-1e, LHS 1140 b), cách báo chí đưa tin, và các phương pháp tương lai (thấu kính hấp dẫn Mặt Trời, tàu buồm laser) ở tài liệu riêng [`khi-quyen-va-tuong-lai.md`](khi-quyen-va-tuong-lai.md).
+
+Kết quả 4 hệ:
+
+| Hành tinh | Nhật thực phụ Kepler | Phổ đã công bố | JWST đáng chụp? |
+|---|---|---|---|
+| Kepler-6 b | **19.0 ± 4.5 ppm** (4.2σ) → albedo ~0.13 | Spitzer 3.6 và 4.5 μm (nhật thực phụ) | ESM 30 ✅, TSM 42 (ngưỡng 90) |
+| Kepler-10 b, c; Kepler-186 b–f; Kepler-452 b | Xem tài liệu từng hệ | Chỉ Kepler-10c có Spitzer 4.5 μm (transit) | Xem tài liệu từng hệ |
+
 ## 8. Thực hành: tải dữ liệu, vẽ và tính thông số
 
 Hai ví dụ (hai hệ nữa có file riêng, tự đủ từ đầu tới cuối: Kepler-452 trong [`kepler-452.md`](kepler-452.md), Kepler-186 trong [`kepler-186.md`](kepler-186.md)):
@@ -552,6 +600,9 @@ py -3.12 -m venv .venv
 
 # Bước 4: tìm vệ tinh (vùng Hill/Roche, TTV, OSE) → giới hạn khối lượng và bán kính vệ tinh (mục 7.9)
 .venv/Scripts/python scripts/04_moons.py "Kepler-6"
+
+# Bước 5: khí quyển: nhật thực phụ Kepler, phổ đã công bố, TSM/ESM (mục 7.11)
+.venv/Scripts/python scripts/05_atmosphere.py "Kepler-6"
 ```
 
 Tùy chọn thêm cho bước 1: `--flatten-window N` (cửa sổ làm phẳng, số điểm; sao có vết đen quay nhanh cần ngắn hơn) và `--mask-known` (che transit đã biết khi làm phẳng để không làm nông transit). Bước 2: `--verify-archive` (hành tinh BLS không tự tìm ra thì kiểm chứng bằng P, T0 của NASA).
@@ -712,11 +763,16 @@ MAST (FITS Kepler)          NASA Exoplanet Archive         Gaia DR3
       │  ──► data/csv/<sao>_<hành tinh>_folded.csv
       ▼
 outputs/<sao>_system.json (sao + mọi hành tinh)
-      │                    │
-      ▼                    ▼
-03_diagram.py        04_moons.py (đọc thêm _all_flat.csv, dùng lại hàm của 02_analyze.py)
-_diagram.png         _moons.png, _moons.md, _transit_times.csv, _ose_profile.csv
+      │                    │                                  │
+      ▼                    ▼                                  ▼
+03_diagram.py        04_moons.py                        05_atmosphere.py
+_diagram.png         _moons.png, _moons.md,             _atmosphere.png, _atmosphere.md,
+                     _transit_times.csv,                _eclipse.csv
+                     _ose_profile.csv                   (+ NASA: transitspec, emissionspec,
+                                                          spectra, cấp sao J/K)
 ```
+
+Bước 4 và 5 đọc thêm `_all_flat.csv` và dùng lại hàm (mô hình batman, gấp pha) của `02_analyze.py`. `_report.md` của bước 2 có sẵn mục **Hình ảnh** chèn mọi ảnh của hệ (cả ảnh bước 3–5), nên chạy đủ 5 bước là báo cáo có đủ hình.
 
 Mỗi bước chỉ đọc file do bước trước ghi ra, nên chạy lại riêng một bước được (vd. chỉ vẽ lại sơ đồ với `--date` khác) mà không phải tải lại dữ liệu.
 
@@ -756,7 +812,7 @@ Thời lượng transit tăng theo $P^{1/3}$ (vì a ∝ P^{2/3}, vận tốc ∝
 | Tầng | Mô hình | Tham số khớp | Dữ liệu dùng | Mục đích |
 |---|---|---|---|---|
 | 1 | Hình thang, lấy trung bình 15 vị trí trong 29.4 phút phơi sáng | độ sâu, T14, thời gian ingress, độ lệch tâm | \|pha\| < max(3 × thời lượng BLS, 0.3 ngày) | Giá trị khởi đầu ổn định. Nếu T14 trôi ra ngoài 0.5–2 lần thời lượng BLS thì kéo về |
-| 2 | `batman`: tối rìa bậc hai u = (0.40, 0.26), quỹ đạo tròn, supersample 7 trong 29.4 phút | ΔT0, k = Rp/Rs, a/Rs, b (chu kỳ giữ cố định) | \|pha\| < max(1.5 × T14, 0.15 ngày) | Thông số vật lý (mục 7.2) |
+| 2 | `batman`: tối rìa bậc hai với hệ số **riêng của sao** (bảng KOI DR25, mục 7.10; không có thì dùng (0.40, 0.26) của sao loại G), quỹ đạo tròn, supersample 7 trong 29.4 phút | ΔT0, k = Rp/Rs, a/Rs, b (chu kỳ giữ cố định) | \|pha\| < max(1.5 × T14, 0.15 ngày) | Thông số vật lý (mục 7.2) |
 
 Giới hạn khi khớp batman: ΔT0 trong ±0.05 ngày, k trong 0.3–2 lần √(độ sâu), a/Rs trong 1.5–1000, b trong 0–1; tối đa 5.000 lần lặp (tín hiệu yếu như Kepler-452b cần nhiều). Giá trị khởi đầu a/Rs ≈ P/(π·T14), tức công thức khi b = 0. Sai số a/Rs lấy từ **ma trận hiệp phương sai** của `curve_fit`; từ đó suy ra i, T14, độ sâu và mật độ sao ρ* (mục 7.1).
 
@@ -771,7 +827,7 @@ Giới hạn khi khớp batman: ΔT0 trong ±0.05 ngày, k trong 0.3–2 lần �
 
 **h) Thành phần** (`scripts/02_analyze.py:352`, công thức mục 7.5): Mp > 50 M⊕ hoặc Rp > 8 R⊕ → coi là khí khổng lồ (Thorngren); còn lại so với các đường sắt 0.86·M^0.27, đá 1.07·M^0.27, 50% nước 1.24·M^0.27 (Zeng), có lớp khí thì giải ngược tỉ lệ khí (Lopez & Fortney) với tuổi sao lấy từ NASA, không có thì giả định 5 tỷ năm.
 
-**i) Khoảng cách** (`scripts/02_analyze.py:281`): truy vấn Gaia DR3 các sao trong bán kính 5″ quanh RA/Dec của header, chỉ giữ sao có thị sai và cấp sao G lệch cấp sao Kepler < 1.5 (tránh nhầm sao bên cạnh), lấy sao gần nhất. d = 1000/ϖ. Không có Gaia thì dùng khoảng cách ước tính từ độ sáng.
+**i) Khoảng cách** (`scripts/02_analyze.py:281`): truy vấn Gaia DR3 các sao trong bán kính 5″ quanh RA/Dec của header, chỉ giữ sao có thị sai và cấp sao G lệch cấp sao Kepler < 1.5 (tránh nhầm sao bên cạnh), lấy sao gần nhất. d = 1000/ϖ. Kết quả được lưu vào file đệm `data/csv/<sao>_gaia.json`; khi máy chủ Gaia (ESA) không phản hồi, code dùng file đệm, rồi tới thị sai Gaia mà NASA lưu sẵn (`sy_plx`), cuối cùng mới tới khoảng cách ước tính từ độ sáng. Báo cáo ghi rõ số liệu lấy từ nguồn nào.
 
 **j) Đối chiếu.** Hành tinh tự tìm khớp với hành tinh NASA hoặc KOI nếu chu kỳ lệch < 1%. Bảng KOI DR25 truy vấn theo `KEPLERID` trong header.
 
@@ -827,12 +883,29 @@ Kết luận (`scripts/04_moons.py:262`): FAP ≥ 0.001 → không thấy TTV. F
 
 Cần ≥ 10 điểm mỗi vùng; nếu vùng vai nằm gọn trong transit hành tinh thì bỏ qua OSE. Biên dạng xuất CSV/vẽ hình chia 120 bin, mỗi bin ≥ 5 điểm.
 
-### 9.6. Giả định chung và giới hạn của code
+### 9.6. Bước 5: khí quyển (`05_atmosphere.py`)
+
+Công thức ở mục 7.11 và [`khi-quyen-va-tuong-lai.md`](khi-quyen-va-tuong-lai.md) mục 1. Chỉ xét hành tinh có transit đã khớp mô hình.
+
+| Việc | Cách làm trong code |
+|---|---|
+| Dữ liệu ngoài | NASA Exoplanet Archive: cấp sao J, K (`pscomppars`); điểm phổ truyền qua (`transitspec`), phát xạ (`emissionspec`), danh sách phổ đã công bố (`spectra`). Độ sâu trong các bảng này tính bằng **%** |
+| Che hành tinh khác | Che cả transit **và nhật thực phụ** (pha 0.5) của các hành tinh khác, \|pha\| < 0.75 × T14 |
+| Nhật thực phụ Kepler | Gấp pha quanh T0 + P/2 (quỹ đạo tròn). "Trong": \|Δt\| < T23/2 với $T_{23} \approx T_{14}(1-k)/(1+k)$ (phần đáy phẳng). "Ngoài": T14/2 + 29.4 phút < \|Δt\| < T14/2 + max(T14, 0.1 ngày), không quá P/4. Độ sâu = trung bình ngoài − trung bình trong; sai số = độ lệch chuẩn vùng ngoài × √(1/n_trong + 1/n_ngoài). Cần ≥ 20 điểm mỗi vùng |
+| Albedo | $A_g = \delta\,(a/R_s)^2/k^2$; trừ thêm phần phát nhiệt dự kiến trong dải Kepler (vật đen ở nhiệt độ phía ngày, bước sóng hiệu dụng 0.64 μm) |
+| Nhiệt độ | $T_{eq,0} = T_*\sqrt{R_s/a}\,(1/4)^{1/4}$ (albedo 0, nhiệt chia đều, đúng định nghĩa của Kempton); phía ngày = 1.1 × $T_{eq,0}$ |
+| Độ cao thang | Với μ = 2.3 (H/He), 18 (hơi nước), 44 (CO₂); g từ khối lượng đo được, không có thì khối lượng ước tính từ bán kính. Biên độ phổ = 2 × 2H × Rp/Rs² |
+| So sánh phổ truyền qua | Điểm Kepler = k² tự đo. Với mỗi điểm đã công bố ở > 1 μm: chênh độ sâu và tỉ số (biên độ khí quyển / sai số đo). Tỉ số < 3: dữ liệu không phân biệt được |
+| Nhiệt độ độ sáng | Giải ngược Planck từ độ sâu nhật thực phụ đã công bố, **coi sao là vật đen**, nên lệch ~10–15% so với bài báo (bài báo dùng mô hình phổ sao) |
+| Ảnh và CSV | `_atmosphere.png`: trái là nhật thực phụ gộp 40 bin; phải là phổ phát xạ kèm đường vật đen, hoặc phổ truyền qua kèm dải biên độ khí quyển, hoặc (không có phổ) bảng TSM/ESM. `_eclipse.csv` cho Google Sheets |
+
+### 9.7. Giả định chung và giới hạn của code
 
 | Giả định | Ở đâu | Ảnh hưởng |
 |---|---|---|
 | Quỹ đạo tròn (e = 0) | Mô hình batman, công thức T14, ρ* | Hành tinh lệch tâm làm ρ* và Ms suy từ transit sai |
-| Tối rìa cố định u = (0.40, 0.26), giá trị cho **sao loại G** | `LIMB_DARKENING` | Với sao lùn M (Kepler-186) hay sao nóng, hình dạng transit, k và b lệch một chút. Chuẩn hơn là tra bảng Claret theo Teff, logg |
+| Tối rìa lấy từ bảng KOI DR25, **cố định** khi khớp (không khớp tự do) | `LIMB_DARKENING` | Đúng cho từng sao (mục 7.10), nhưng vẫn là giá trị lý thuyết; với tín hiệu rất mạnh (Kepler-6b) có thể khớp tự do u₁, u₂ để kiểm tra mô hình sao |
+| Sao là vật đen khi tính nhiệt độ độ sáng | `05_atmosphere.py` | Lệch ~10–15% so với dùng mô hình phổ sao |
 | Bán kính sao lấy từ KIC | Header FITS | Sai số Rs truyền thẳng vào Rp (Kepler-6b lệch 10%, mục 8.3) |
 | Albedo 0.3 | Teq | Teq chỉ là ước lượng |
 | Nhiễu trắng | BLS, χ², OSE | Nhiễu đỏ làm SNR và giới hạn thực tế kém hơn con số in ra |
