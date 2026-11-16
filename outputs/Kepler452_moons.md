@@ -1,27 +1,29 @@
 # Tìm vệ tinh quanh các hành tinh của Kepler-452
 
+![O − C (trái) và vùng vai OSE (phải) của từng hành tinh](Kepler452_moons.png)
+
 Light curve Kepler chỉ đặt được **giới hạn trên**: vệ tinh lớn/nặng hơn mức này đã bị loại. Giả định vệ tinh đá (mật độ 3 g/cm³), quỹ đạo tròn, cùng chiều; giới hạn tính cho vệ tinh ở xa nhất có thể (0.49 bán kính Hill), nơi tín hiệu lớn nhất.
 
 | Thông số | Kepler-452 b |
 |---|---|
 | Khối lượng hành tinh dùng (M⊕) | 1.1 (ước tính từ bán kính) |
-| Bán kính Hill (km) | 1,581,754 |
-| Quỹ đạo vệ tinh xa nhất bền vững, 0.49 R_Hill (km) | 774,269 |
-| Giới hạn Roche (km) | 19,437 |
+| Bán kính Hill (km) | 1,576,469 |
+| Quỹ đạo vệ tinh xa nhất bền vững, 0.49 R_Hill (km) | 771,681 |
+| Giới hạn Roche (km) | 19,372 |
 | **Vệ tinh có thể tồn tại?** | ✅ có |
 | Chu kỳ vệ tinh dài nhất (ngày) | 76.09 |
-| Vệ tinh lệch trước/sau hành tinh tối đa (giờ) | 7.70 |
+| Vệ tinh lệch trước/sau hành tinh tối đa (giờ) | 7.67 |
 | Số transit định thời được | 4 |
-| Sai số thời điểm mỗi transit (phút) | 16.7 |
-| O−C rms (phút) | 21.4 |
-| χ²_red của O−C (≈ 1 nếu sai số đúng) | 3.47 |
+| Sai số thời điểm mỗi transit (phút) | 17.0 |
+| O−C rms (phút) | 21.5 |
+| χ²_red của O−C (≈ 1 nếu sai số đúng) | 3.90 |
 | Periodogram O−C: chu kỳ mạnh nhất (vòng) / FAP | — |
 | O−C phụ thuộc vị trí trong lưới đo 29.4 phút? (p) | — |
 | Chu kỳ O−C lặp lại ở cả 2 nửa dữ liệu? | — |
 | Kết luận TTV | Quá ít transit (4) để kiểm định tính chu kỳ; chỉ đặt được giới hạn trên |
-| Giới hạn TTV rms = O−C rms (phút) | 21.4 |
-| **Khối lượng vệ tinh tối đa (từ TTV)** | 0.0696 M⊕ = 5.66 lần Mặt Trăng |
-| Vai trũng OSE (ppm) | -8.9 ± 14.7 |
+| Giới hạn TTV rms = O−C rms (phút) | 21.5 |
+| **Khối lượng vệ tinh tối đa (từ TTV)** | 0.0695 M⊕ = 5.66 lần Mặt Trăng |
+| Vai trũng OSE (ppm) | -10.9 ± 14.8 |
 | **Bán kính vệ tinh tối đa (từ OSE)** | 0.75 R⊕: đã loại vật cỡ Trái Đất trở lên; chưa loại được vật cỡ Sao Hỏa |
 
 Ghi chú:

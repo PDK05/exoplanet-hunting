@@ -1,0 +1,47 @@
+{
+ "target": "Proxima Centauri",
+ "star": {
+  "teff": 2900.0,
+  "radius_rsun": 0.141,
+  "lum_lsun": 0.0015100106140043385,
+  "distance_pc": 1.30119
+ },
+ "planets": [
+  {
+   "name": "Proxima Cen d",
+   "a_au": 0.02881,
+   "period_days": 5.12338,
+   "transiting": false,
+   "radius_earth": 0.692,
+   "radius_measured": false,
+   "t0_bkjd": null,
+   "teq_k": 282.9579586666111
+  },
+  {
+   "name": "Proxima Cen b",
+   "a_au": 0.04848,
+   "period_days": 11.18465,
+   "transiting": false,
+   "radius_earth": 1.02,
+   "radius_measured": false,
+   "t0_bkjd": null,
+   "teq_k": 218.1284118005872
+  },
+  {
+   "name": "Proxima Cen c",
+   "status": "candidate",
+   "a_au": 1.49,
+   "period_days": 1928,
+   "mass_earth": 7.0,
+   "transiting": false,
+   "t0_bkjd": null,
+   "radius_measured": false,
+   "radius_earth": 2.5377185070670887,
+   "teq_k": 39.34598378487664
+  }
+ ],
+ "notes": [
+  "? c (Damasso et al. 2020, chu kỳ ~5 năm): tín hiệu RV yếu, chu kỳ gần bằng thời gian quan sát, chưa được nhóm độc lập xác nhận."
+ ],
+ "source": "NASA pscomppars + bài báo (bước 7)"
+}

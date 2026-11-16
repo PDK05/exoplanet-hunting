@@ -1,0 +1,65 @@
+{
+ "target": "55 Cancri",
+ "star": {
+  "teff": 5172.0,
+  "radius_rsun": 0.943,
+  "lum_lsun": 0.6354040812391201,
+  "distance_pc": 12.5855
+ },
+ "planets": [
+  {
+   "name": "55 Cnc e",
+   "a_au": 0.01544,
+   "period_days": 0.7365474,
+   "transiting": true,
+   "radius_earth": 1.875,
+   "radius_measured": true,
+   "t0_bkjd": 2230.2096000001766,
+   "teq_k": 1782.6935911983417
+  },
+  {
+   "name": "55 Cnc b",
+   "a_au": 0.118,
+   "period_days": 14.651552,
+   "transiting": false,
+   "radius_earth": 13.9,
+   "radius_measured": false,
+   "t0_bkjd": null,
+   "teq_k": 644.8509552873995
+  },
+  {
+   "name": "55 Cnc c",
+   "a_au": 0.247,
+   "period_days": 44.3936,
+   "transiting": false,
+   "radius_earth": 8.51,
+   "radius_measured": false,
+   "t0_bkjd": null,
+   "teq_k": 445.70948325349667
+  },
+  {
+   "name": "55 Cnc f",
+   "a_au": 0.802,
+   "period_days": 260.58,
+   "transiting": false,
+   "radius_earth": 7.59,
+   "radius_measured": false,
+   "t0_bkjd": null,
+   "teq_k": 247.35071327072063
+  },
+  {
+   "name": "55 Cnc d",
+   "a_au": 5.6,
+   "period_days": 4799.0,
+   "transiting": false,
+   "radius_earth": 13.0,
+   "radius_measured": false,
+   "t0_bkjd": null,
+   "teq_k": 93.6065712695757
+  }
+ ],
+ "notes": [
+  "e: hành tinh dung nham ~2.000 °C. JWST 2024 (Hu et al.) có dấu hiệu khí quyển thứ cấp CO/CO₂; độ sâu nhật thực thay đổi giữa các lần đo. Hoàn toàn không thể có sự sống. Phổ: outputs/disputed/55Cnce_spectra.png."
+ ],
+ "source": "NASA pscomppars + bài báo (bước 7)"
+}

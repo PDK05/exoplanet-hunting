@@ -1,0 +1,35 @@
+{
+ "target": "K2-18",
+ "star": {
+  "teff": 3457.0,
+  "radius_rsun": 0.411,
+  "lum_lsun": 0.025299969638710982,
+  "distance_pc": 38.0266
+ },
+ "planets": [
+  {
+   "name": "K2-18 c",
+   "a_au": 0.06,
+   "period_days": 8.962,
+   "transiting": false,
+   "radius_earth": 2.65,
+   "radius_measured": false,
+   "t0_bkjd": null,
+   "teq_k": 399.05306782063354
+  },
+  {
+   "name": "K2-18 b",
+   "a_au": 0.1429,
+   "period_days": 32.939623,
+   "transiting": true,
+   "radius_earth": 2.37,
+   "radius_measured": true,
+   "t0_bkjd": 2431.3914399999194,
+   "teq_k": 258.5771620792141
+  }
+ ],
+ "notes": [
+  "b: sub-Neptune 8,6–8,9 M⊕ trong vùng có thể sống. CH₄, CO₂ (JWST 2023) khá vững; DMS/DMDS 'dấu hiệu sự sống' (~3σ, 2025) bị nhiều phân tích độc lập bác là không đủ bằng chứng. Phổ: outputs/disputed/K218b_spectra.png."
+ ],
+ "source": "NASA pscomppars + bài báo (bước 7)"
+}

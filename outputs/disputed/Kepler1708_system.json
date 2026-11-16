@@ -1,0 +1,25 @@
+{
+ "target": "Kepler-1708",
+ "star": {
+  "teff": 6157.0,
+  "radius_rsun": 1.117,
+  "lum_lsun": 1.5205475297324955,
+  "distance_pc": 1666.69
+ },
+ "planets": [
+  {
+   "name": "Kepler-1708 b",
+   "a_au": 1.64,
+   "period_days": 737.1131,
+   "transiting": true,
+   "radius_earth": 9.96,
+   "radius_measured": true,
+   "t0_bkjd": null,
+   "teq_k": 224.1092616334173
+  }
+ ],
+ "notes": [
+  "b: ứng viên vệ tinh ~2,6 R⊕ Kepler-1708 b-i (Kipping et al. 2022), đang tranh cãi. Pipeline repo: outputs/Kepler1708_report.md, _moons.md."
+ ],
+ "source": "NASA pscomppars + bài báo (bước 7)"
+}

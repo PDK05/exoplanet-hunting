@@ -1,0 +1,69 @@
+{
+ "target": "Barnard's star",
+ "star": {
+  "teff": 3195.0,
+  "radius_rsun": 0.185,
+  "lum_lsun": 0.0035500134624448284,
+  "distance_pc": 1.82655
+ },
+ "planets": [
+  {
+   "name": "Barnard d",
+   "a_au": 0.0188,
+   "period_days": 2.3402,
+   "transiting": false,
+   "radius_earth": 0.694,
+   "radius_measured": false,
+   "t0_bkjd": null,
+   "teq_k": 442.042260048516
+  },
+  {
+   "name": "Barnard b",
+   "a_au": 0.0229,
+   "period_days": 3.1542,
+   "transiting": false,
+   "radius_earth": 0.72,
+   "radius_measured": false,
+   "t0_bkjd": null,
+   "teq_k": 400.52070702856975
+  },
+  {
+   "name": "Barnard c",
+   "a_au": 0.0274,
+   "period_days": 4.1244,
+   "transiting": false,
+   "radius_earth": 0.743,
+   "radius_measured": false,
+   "t0_bkjd": null,
+   "teq_k": 366.1570781838582
+  },
+  {
+   "name": "Barnard e",
+   "a_au": 0.0381,
+   "period_days": 6.7392,
+   "transiting": false,
+   "radius_earth": 0.637,
+   "radius_measured": false,
+   "t0_bkjd": null,
+   "teq_k": 310.5133148219533
+  },
+  {
+   "name": "Barnard b (2018)",
+   "label": "b 2018",
+   "status": "refuted",
+   "a_au": 0.404,
+   "period_days": 232.8,
+   "mass_earth": 3.2,
+   "transiting": false,
+   "t0_bkjd": null,
+   "radius_measured": false,
+   "radius_earth": 1.6003465523353335,
+   "teq_k": 95.35687997646075
+  }
+ ],
+ "notes": [
+  "✗ 'b 2018' (Ribas et al. 2018, siêu Trái Đất lạnh 233 ngày): Lubin et al. 2021, do hoạt động sao + alias 1 năm.",
+  "b, c, d, e (González Hernández et al. 2024; Basant et al. 2025): 4 hành tinh rất nhỏ, quá nóng, đã xác nhận."
+ ],
+ "source": "NASA pscomppars + bài báo (bước 7)"
+}

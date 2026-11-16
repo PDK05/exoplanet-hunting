@@ -1,0 +1,85 @@
+{
+ "target": "TRAPPIST-1",
+ "star": {
+  "teff": 2566.0,
+  "radius_rsun": 0.1192,
+  "lum_lsun": 0.0005530061994883787,
+  "distance_pc": 12.42988881
+ },
+ "planets": [
+  {
+   "name": "TRAPPIST-1 b",
+   "a_au": 0.01154,
+   "period_days": 1.510826,
+   "transiting": true,
+   "radius_earth": 1.116,
+   "radius_measured": true,
+   "t0_bkjd": 2489.5141929998063,
+   "teq_k": 363.7289458533963
+  },
+  {
+   "name": "TRAPPIST-1 c",
+   "a_au": 0.0158,
+   "period_days": 2.421937,
+   "transiting": true,
+   "radius_earth": 1.097,
+   "radius_measured": true,
+   "t0_bkjd": 2449.8113870997913,
+   "teq_k": 310.85096854896705
+  },
+  {
+   "name": "TRAPPIST-1 d",
+   "a_au": 0.02227,
+   "period_days": 4.049219,
+   "transiting": true,
+   "radius_earth": 0.788,
+   "radius_measured": true,
+   "t0_bkjd": 2837.1463013999164,
+   "teq_k": 261.8307560872411
+  },
+  {
+   "name": "TRAPPIST-1 e",
+   "a_au": 0.02925,
+   "period_days": 6.101013,
+   "transiting": true,
+   "radius_earth": 0.92,
+   "radius_measured": true,
+   "t0_bkjd": 2827.3676621001214,
+   "teq_k": 228.46402993066906
+  },
+  {
+   "name": "TRAPPIST-1 f",
+   "a_au": 0.03849,
+   "period_days": 9.20754,
+   "transiting": true,
+   "radius_earth": 1.045,
+   "radius_measured": true,
+   "t0_bkjd": 2838.3737298999913,
+   "teq_k": 199.16215315296483
+  },
+  {
+   "name": "TRAPPIST-1 g",
+   "a_au": 0.04683,
+   "period_days": 12.352446,
+   "transiting": true,
+   "radius_earth": 1.129,
+   "radius_measured": true,
+   "t0_bkjd": 2832.3628438999876,
+   "teq_k": 180.5588123575253
+  },
+  {
+   "name": "TRAPPIST-1 h",
+   "a_au": 0.06189,
+   "period_days": 18.772866,
+   "transiting": true,
+   "radius_earth": 0.755,
+   "radius_measured": true,
+   "t0_bkjd": 2829.5741485999897,
+   "teq_k": 157.06178432368026
+  }
+ ],
+ "notes": [
+  "e, f (vùng có thể sống): JWST loại khí quyển giàu H₂ (e: 2025, f: 2026); khí quyển N₂ kiểu Trái Đất hay đá trần vẫn chưa phân biệt được. Chương trình JWST 15 transit của e: tới 11/2026 chưa công bố kết quả."
+ ],
+ "source": "NASA pscomppars + bài báo (bước 7)"
+}

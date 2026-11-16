@@ -1,0 +1,81 @@
+{
+ "target": "GJ 581",
+ "star": {
+  "teff": 3500.0,
+  "radius_rsun": 0.302,
+  "lum_lsun": 0.012364882678268518,
+  "distance_pc": 6.2981
+ },
+ "planets": [
+  {
+   "name": "GJ 581 e",
+   "a_au": 0.02799,
+   "period_days": 3.1481,
+   "transiting": false,
+   "radius_earth": 1.38,
+   "radius_measured": false,
+   "t0_bkjd": null,
+   "teq_k": 507.05615075011565
+  },
+  {
+   "name": "GJ 581 b",
+   "a_au": 0.0399,
+   "period_days": 5.3686,
+   "transiting": false,
+   "radius_earth": 4.79,
+   "radius_measured": false,
+   "t0_bkjd": null,
+   "teq_k": 424.6890432812829
+  },
+  {
+   "name": "GJ 581 c",
+   "a_au": 0.0718,
+   "period_days": 12.9211,
+   "transiting": false,
+   "radius_earth": 2.5,
+   "radius_measured": false,
+   "t0_bkjd": null,
+   "teq_k": 316.58860727003895
+  },
+  {
+   "name": "GJ 581 g",
+   "status": "refuted",
+   "a_au": 0.146,
+   "period_days": 36.6,
+   "mass_earth": 3.1,
+   "transiting": false,
+   "t0_bkjd": null,
+   "radius_measured": false,
+   "radius_earth": 1.5706981745772264,
+   "teq_k": 222.0143655258664
+  },
+  {
+   "name": "GJ 581 d",
+   "status": "refuted",
+   "a_au": 0.218,
+   "period_days": 66.6,
+   "mass_earth": 6.1,
+   "transiting": false,
+   "t0_bkjd": null,
+   "radius_measured": false,
+   "radius_earth": 2.3401299458704337,
+   "teq_k": 181.68926065037903
+  },
+  {
+   "name": "GJ 581 f",
+   "status": "refuted",
+   "a_au": 0.758,
+   "period_days": 433,
+   "mass_earth": 7.0,
+   "transiting": false,
+   "t0_bkjd": null,
+   "radius_measured": false,
+   "radius_earth": 2.5377185070670887,
+   "teq_k": 97.43677512320326
+  }
+ ],
+ "notes": [
+  "✗ d (Udry 2007), g, f (Vogt 2010): Robertson et al. 2014 cho thấy d và g là tín hiệu do hoạt động của sao (sao tự quay 130 ngày; d ≈ P_rot/2); f không được dữ liệu HARPS xác nhận. b, c, e vẫn là hành tinh thật."
+ ],
+ "source": "NASA pscomppars + bài báo (bước 7)"
+}

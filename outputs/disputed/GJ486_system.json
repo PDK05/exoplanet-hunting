@@ -1,0 +1,25 @@
+{
+ "target": "GJ 486",
+ "star": {
+  "teff": 3317.0,
+  "radius_rsun": 0.3243,
+  "lum_lsun": 0.01151012393735847,
+  "distance_pc": 8.07426
+ },
+ "planets": [
+  {
+   "name": "GJ 486 b",
+   "a_au": 0.01714,
+   "period_days": 1.46712127,
+   "transiting": true,
+   "radius_earth": 1.289,
+   "radius_measured": true,
+   "t0_bkjd": 5106.071601999924,
+   "teq_k": 636.35509503604
+  }
+ ],
+ "notes": [
+  "b: JWST 2023 (Moran et al.) thấy tín hiệu hơi nước, nhưng có thể do vết lạnh trên sao. Phổ: outputs/disputed/GJ486b_spectra.png."
+ ],
+ "source": "NASA pscomppars + bài báo (bước 7)"
+}

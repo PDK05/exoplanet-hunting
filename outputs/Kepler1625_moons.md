@@ -1,0 +1,33 @@
+# Tìm vệ tinh quanh các hành tinh của Kepler-1625
+
+![O − C (trái) và vùng vai OSE (phải) của từng hành tinh](Kepler1625_moons.png)
+
+Light curve Kepler chỉ đặt được **giới hạn trên**: vệ tinh lớn/nặng hơn mức này đã bị loại. Giả định vệ tinh đá (mật độ 3 g/cm³), quỹ đạo tròn, cùng chiều; giới hạn tính cho vệ tinh ở xa nhất có thể (0.49 bán kính Hill), nơi tín hiệu lớn nhất.
+
+| Thông số | Kepler-1625 b |
+|---|---|
+| Khối lượng hành tinh dùng (M⊕) | 25.6 (ước tính từ bán kính) |
+| Bán kính Hill (km) | 3,757,624 |
+| Quỹ đạo vệ tinh xa nhất bền vững, 0.49 R_Hill (km) | 1,839,357 |
+| Giới hạn Roche (km) | 56,099 |
+| **Vệ tinh có thể tồn tại?** | ✅ có |
+| Chu kỳ vệ tinh dài nhất (ngày) | 56.82 |
+| Vệ tinh lệch trước/sau hành tinh tối đa (giờ) | 16.65 |
+| Số transit định thời được | 3 |
+| Sai số thời điểm mỗi transit (phút) | 6.1 |
+| O−C rms (phút) | 8.5 |
+| χ²_red của O−C (≈ 1 nếu sai số đúng) | 5.55 |
+| Periodogram O−C: chu kỳ mạnh nhất (vòng) / FAP | — |
+| O−C phụ thuộc vị trí trong lưới đo 29.4 phút? (p) | — |
+| Chu kỳ O−C lặp lại ở cả 2 nửa dữ liệu? | — |
+| Kết luận TTV | Quá ít transit (3) để kiểm định tính chu kỳ; chỉ đặt được giới hạn trên |
+| Giới hạn TTV rms = O−C rms (phút) | 8.5 |
+| **Khối lượng vệ tinh tối đa (từ TTV)** | 0.306 M⊕ = 24.9 lần Mặt Trăng |
+| Vai trũng OSE (ppm) | 35.6 ± 60.2 |
+| **Bán kính vệ tinh tối đa (từ OSE)** | 1.90 R⊕: chưa loại được vật cỡ Trái Đất |
+
+Ghi chú:
+- **TTV** ở đây là độ lệch thời điểm so với chu kỳ đều. TTV đáng kể có thể do hành tinh khác kéo, vết đen trên sao, nhiễu đỏ... chứ không nhất thiết là vệ tinh.
+- Vệ tinh gần hành tinh hơn a_max thì TTV nhỏ hơn (tỉ lệ với khoảng cách), nên giới hạn khối lượng yếu đi tương ứng.
+- **OSE** giả định nhiễu trắng; nhiễu đỏ làm giới hạn thực tế kém hơn. Một tín hiệu "vai" dương cũng có thể là do bước làm phẳng light curve.
+- Hành tinh quá gần sao: bán kính Hill nhỏ, vệ tinh còn bị thủy triều kéo dần vào hành tinh hoặc văng ra trong thời gian ngắn hơn tuổi hệ (Barnes & O'Brien 2002), nên khó tồn tại kể cả khi nằm trong vùng bền.

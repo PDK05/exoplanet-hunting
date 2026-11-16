@@ -1,0 +1,38 @@
+{
+ "target": "Kapteyn's star",
+ "star": {
+  "teff": 3550.0,
+  "radius_rsun": 0.291,
+  "lum_lsun": 0.01611053638195743,
+  "distance_pc": 3.93305
+ },
+ "planets": [
+  {
+   "name": "Kapteyn b",
+   "status": "refuted",
+   "a_au": 0.168,
+   "period_days": 48.6,
+   "mass_earth": 4.8,
+   "transiting": false,
+   "t0_bkjd": null,
+   "radius_measured": false,
+   "radius_earth": 2.032037836113891,
+   "teq_k": 206.06593087965965
+  },
+  {
+   "name": "Kapteyn c",
+   "a_au": 0.311,
+   "period_days": 121.54,
+   "transiting": false,
+   "radius_earth": 2.54,
+   "radius_measured": false,
+   "t0_bkjd": null,
+   "status": "refuted",
+   "teq_k": 151.45396297376385
+  }
+ ],
+ "notes": [
+  "✗ b (trong vùng có thể sống) và c (Anglada-Escudé et al. 2014): Robertson et al. 2015 và Bortle et al. 2021 cho thấy cả hai là tín hiệu do hoạt động của sao. NASA vẫn còn liệt kê Kapteyn c."
+ ],
+ "source": "NASA pscomppars + bài báo (bước 7)"
+}

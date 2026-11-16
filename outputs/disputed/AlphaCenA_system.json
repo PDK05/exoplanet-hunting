@@ -1,0 +1,27 @@
+{
+ "target": "Alpha Centauri A",
+ "star": {
+  "teff": 5790,
+  "radius_rsun": 1.22,
+  "lum_lsun": 1.52,
+  "distance_pc": 1.347
+ },
+ "planets": [
+  {
+   "name": "α Cen A S1",
+   "label": "S1",
+   "status": "candidate",
+   "a_au": 1.6,
+   "period_days": 900,
+   "radius_earth": 11.2,
+   "transiting": false,
+   "t0_bkjd": null,
+   "radius_measured": false,
+   "teq_k": 222.98953215751473
+  }
+ ],
+ "notes": [
+  "? S1 (Sanghi, Beichman et al. 2025): chấm sáng JWST MIRI 8/2024, chưa thấy lại (2/2025, 4/2025). Quỹ đạo e ≈ 0,4, chu kỳ 2–3 năm, cỡ khí khổng lồ: a và bán kính ở đây là giá trị minh họa trong khoảng bài báo đưa ra."
+ ],
+ "source": "NASA pscomppars + bài báo (bước 7)"
+}

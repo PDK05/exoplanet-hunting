@@ -1,0 +1,26 @@
+{
+ "target": "Fomalhaut",
+ "star": {
+  "teff": 8590,
+  "radius_rsun": 1.84,
+  "lum_lsun": 16.6,
+  "distance_pc": 7.7
+ },
+ "planets": [
+  {
+   "name": "Fomalhaut b",
+   "status": "refuted",
+   "a_au": 177,
+   "period_days": 620925.0,
+   "radius_earth": 11.2,
+   "transiting": false,
+   "t0_bkjd": null,
+   "radius_measured": false,
+   "teq_k": 38.62792955962989
+  }
+ ],
+ "notes": [
+  "✗ b (Kalas et al. 2008, ảnh HST): Gáspár & Rieke 2020: chấm sáng nở to và mờ dần, là đám bụi từ va chạm, không phải hành tinh. Vùng có thể sống tính theo công thức cho sao ≤ 7200 K nên chỉ là gần đúng (Fomalhaut 8590 K)."
+ ],
+ "source": "NASA pscomppars + bài báo (bước 7)"
+}

@@ -1,0 +1,37 @@
+{
+  "target": "Kepler-1625",
+  "star": {
+    "teff": 5645.0,
+    "radius_rsun": 0.838,
+    "mass_msun": 0.8596290006566444,
+    "lum_lsun": 0.6424488153313505,
+    "distance_pc": 2460.3272235207282,
+    "logg": 4.526,
+    "kepmag": 15.756,
+    "limb_darkening": [
+      0.4554,
+      0.2329
+    ]
+  },
+  "planets": [
+    {
+      "name": "Kepler-1625 b",
+      "period_days": 287.378949,
+      "t0_bkjd": 348.82927324140354,
+      "a_au": 0.8104103370880812,
+      "radius_earth": 5.452459055188316,
+      "radius_measured": true,
+      "mass_earth": null,
+      "mass_estimate_earth": 25.57276441238123,
+      "t14_days": 0.7836571102542004,
+      "rp_rs": 0.0595845955887303,
+      "a_rs": 123.68583033718755,
+      "impact_b": 3.0310036027066936e-05,
+      "depth": 0.004384340082086102,
+      "detection": "verify",
+      "transiting": true,
+      "teq_k": 253.185125012422,
+      "composition": "Giống Sao Hải Vương (chỉ theo bán kính)"
+    }
+  ]
+}

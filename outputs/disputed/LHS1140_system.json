@@ -1,0 +1,35 @@
+{
+ "target": "LHS 1140",
+ "star": {
+  "teff": 3096.0,
+  "radius_rsun": 0.2159,
+  "lum_lsun": 0.0037999685303685493,
+  "distance_pc": 14.9861
+ },
+ "planets": [
+  {
+   "name": "LHS 1140 c",
+   "a_au": 0.027,
+   "period_days": 3.77794,
+   "transiting": true,
+   "radius_earth": 1.272,
+   "radius_measured": true,
+   "t0_bkjd": 3556.2938999999315,
+   "teq_k": 386.12807483102864
+  },
+  {
+   "name": "LHS 1140 b",
+   "a_au": 0.0946,
+   "period_days": 24.73723,
+   "transiting": true,
+   "radius_earth": 1.73,
+   "radius_measured": true,
+   "t0_bkjd": 3566.9300000001676,
+   "teq_k": 206.28502097865027
+  }
+ ],
+ "notes": [
+  "b: siêu Trái Đất trong vùng có thể sống. JWST 2024 (Cadieux et al.) loại khí quyển H₂ dày, gợi ý tạm thời có N₂; chưa xác nhận."
+ ],
+ "source": "NASA pscomppars + bài báo (bước 7)"
+}

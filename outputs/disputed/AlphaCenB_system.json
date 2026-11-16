@@ -1,0 +1,28 @@
+{
+ "target": "Alpha Centauri B",
+ "star": {
+  "teff": 5260,
+  "radius_rsun": 0.863,
+  "lum_lsun": 0.5,
+  "distance_pc": 1.347
+ },
+ "planets": [
+  {
+   "name": "α Cen Bb",
+   "label": "Bb",
+   "status": "refuted",
+   "a_au": 0.04,
+   "period_days": 3.236,
+   "mass_earth": 1.13,
+   "transiting": false,
+   "t0_bkjd": null,
+   "radius_measured": false,
+   "radius_earth": 1.0346867454757687,
+   "teq_k": 1077.5740766656195
+  }
+ ],
+ "notes": [
+  "✗ Bb (Dumusque et al. 2012, Nature): Rajpaul et al. 2016 cho thấy tín hiệu sinh ra từ lịch quan sát (window function). Hiện không có hành tinh nào được xác nhận quanh α Cen B."
+ ],
+ "source": "NASA pscomppars + bài báo (bước 7)"
+}

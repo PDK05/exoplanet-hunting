@@ -1,0 +1,35 @@
+{
+ "target": "GJ 1132",
+ "star": {
+  "teff": 3229.0,
+  "radius_rsun": 0.2211,
+  "lum_lsun": 0.004770017803572017,
+  "distance_pc": 12.613
+ },
+ "planets": [
+  {
+   "name": "GJ 1132 b",
+   "a_au": 0.0157,
+   "period_days": 1.62892911,
+   "transiting": true,
+   "radius_earth": 1.19151465,
+   "radius_measured": true,
+   "t0_bkjd": 4447.989879999775,
+   "teq_k": 534.4395365531045
+  },
+  {
+   "name": "GJ 1132 c",
+   "a_au": 0.0476,
+   "period_days": 8.929,
+   "transiting": false,
+   "radius_earth": 1.52,
+   "radius_measured": false,
+   "t0_bkjd": null,
+   "teq_k": 306.933950078314
+  }
+ ],
+ "notes": [
+  "b: HST 2021 (Swain et al.) tuyên bố khí quyển núi lửa; nhóm khác cùng dữ liệu ra phổ phẳng; JWST 2023: 2 lần transit cho 2 kết quả khác nhau; 2025: nhiều khả năng đá trần. Phổ: outputs/disputed/GJ1132b_spectra.png."
+ ],
+ "source": "NASA pscomppars + bài báo (bước 7)"
+}

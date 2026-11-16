@@ -1,0 +1,25 @@
+{
+ "target": "Kepler-1625",
+ "star": {
+  "teff": 5677.0,
+  "radius_rsun": 0.94,
+  "lum_lsun": 2.735016810348268,
+  "distance_pc": 2310.11
+ },
+ "planets": [
+  {
+   "name": "Kepler-1625 b",
+   "a_au": 0.87762,
+   "period_days": 287.378949,
+   "transiting": true,
+   "radius_earth": 6.06,
+   "radius_measured": true,
+   "t0_bkjd": 348.82981000002474,
+   "teq_k": 259.1287223644063
+  }
+ ],
+ "notes": [
+  "b: ứng viên vệ tinh cỡ Sao Hải Vương Kepler-1625 b-i (Teachey & Kipping 2018), đang tranh cãi (Heller & Hippke 2024). Pipeline repo: outputs/Kepler1625_report.md, _moons.md."
+ ],
+ "source": "NASA pscomppars + bài báo (bước 7)"
+}
