@@ -64,12 +64,15 @@ GAIA_URL = "https://gea.esac.esa.int/tap-server/tap/sync"
 ARCHIVE_COLS = (
     "pl_name,discoverymethod,tran_flag,pl_orbper,pl_tranmid,pl_trandur,pl_trandep,pl_ratror,pl_rade,pl_radj,"
     "pl_bmasse,pl_bmassj,pl_bmassprov,pl_dens,pl_orbsmax,pl_orbeccen,pl_orbincl,pl_imppar,pl_ratdor,pl_eqt,"
-    "pl_insol,pl_rvamp,st_teff,st_rad,st_mass,st_met,st_logg,st_dens,st_age,sy_dist,sy_plx"
+    "pl_insol,pl_rvamp,st_teff,st_rad,st_mass,st_met,st_logg,st_dens,st_age,sy_dist,sy_plx,sy_plxerr1"
 )
 
 EXPOSURE = 29.4 / 1440  # mỗi điểm long cadence là ánh sáng cộng dồn trong 29.4 phút (ngày)
-# Hệ số tối rìa bậc hai (u1, u2) cho sao loại G trong bộ lọc Kepler, giá trị gần đúng
+# Hệ số tối rìa bậc hai (u1, u2) trong bộ lọc Kepler. Mặc định: giá trị gần đúng cho sao loại G.
+# main() thay bằng hệ số riêng của sao lấy từ bảng KOI DR25 (koi_ldm_coeff1/2, Claret tính theo Teff, logg,
+# [Fe/H] của chính sao đó), nên sao lùn M hay sao nóng không bị dùng nhầm hệ số của sao giống Mặt Trời.
 LIMB_DARKENING = [0.40, 0.26]
+LIMB_DARKENING_SOURCE = "mặc định cho sao loại G (0.40, 0.26)"
 
 # Ngưỡng chấp nhận một tín hiệu BLS là transit thật (xem mục 7.6 trong sổ tay)
 MIN_SDE = 9.0  # đỉnh periodogram phải nổi bật hơn hẳn phần còn lại
@@ -272,10 +275,32 @@ def fetch_archive_planets(host: str):
 def fetch_kois(kepid: int):
     """Các KOI (ứng viên Kepler) của sao, bảng Q1–Q17 DR25."""
     query = (
-        "select kepoi_name,kepler_name,koi_disposition,koi_period,koi_prad,koi_depth,koi_model_snr "
+        "select kepoi_name,kepler_name,koi_disposition,koi_period,koi_prad,koi_depth,koi_model_snr,"
+        "koi_ldm_coeff1,koi_ldm_coeff2,koi_steff,koi_slogg,koi_smet "
         f"from q1_q17_dr25_koi where kepid={kepid}"
     )
     return sorted(tap_query(ARCHIVE_URL, query), key=lambda row: row["kepoi_name"])
+
+
+def fetch_gaia_cached(name: str, ra: float, dec: float, mag: float, archive_row: dict):
+    """Gaia DR3, có file đệm data/csv/<sao>_gaia.json (máy chủ Gaia ở ESA đôi khi không truy cập được).
+
+    Thứ tự: truy vấn Gaia (thành công thì ghi đệm) → đọc file đệm → thị sai Gaia mà NASA Exoplanet Archive lưu sẵn
+    (cột sy_plx, không có RUWE) → None. Trường "source" cho biết số liệu lấy từ đâu."""
+    cache = CSV_DIR / f"{name}_gaia.json"
+    gaia = fetch_gaia(ra, dec, mag)
+    if gaia:
+        gaia["source"] = "Gaia DR3 (truy vấn trực tiếp)"
+        cache.write_text(json.dumps(gaia, ensure_ascii=False, indent=1), encoding="utf-8")
+        return gaia
+    if cache.exists():
+        gaia = json.loads(cache.read_text(encoding="utf-8"))
+        gaia["source"] = "Gaia DR3 (file đệm, máy chủ Gaia không phản hồi)"
+        return gaia
+    if archive_row.get("sy_plx"):
+        return {"source_id": "?", "parallax": archive_row["sy_plx"], "parallax_error": archive_row.get("sy_plxerr1") or 0.0,
+                "ruwe": None, "source": "thị sai lưu trên NASA Exoplanet Archive (sy_plx), máy chủ Gaia không phản hồi"}
+    return None
 
 
 def fetch_gaia(ra: float, dec: float, mag: float):
@@ -432,6 +457,11 @@ def main():
         "--verify-archive", action="store_true",
         help="Hành tinh có transit trên NASA mà BLS không tự tìm ra: dùng P, T0 của NASA để gấp pha + khớp mô hình",
     )
+    parser.add_argument(
+        "--ephemeris", type=float, nargs=3, metavar=("P", "T0_BKJD", "T14_GIO"),
+        help="Dùng với --verify-archive khi NASA thiếu T0/T14 của hành tinh (vd. Kepler-1708 b): "
+             "P, T0 tự đo trong light curve, áp cho hành tinh trên NASA có chu kỳ gần P nhất",
+    )
     args = parser.parse_args()
 
     name = slug(args.target)
@@ -471,6 +501,25 @@ def main():
     kois = fetch_kois(int(header["KEPLERID"]))
     age = next((row["st_age"] for row in archive_planets if row.get("st_age")), None)
 
+    # Hệ số tối rìa riêng của sao (mọi KOI của cùng một sao có chung hệ số)
+    global LIMB_DARKENING, LIMB_DARKENING_SOURCE
+    ld_row = next((k for k in kois if k.get("koi_ldm_coeff1") is not None and k.get("koi_ldm_coeff2") is not None), None)
+    if ld_row:
+        LIMB_DARKENING = [ld_row["koi_ldm_coeff1"], ld_row["koi_ldm_coeff2"]]
+        LIMB_DARKENING_SOURCE = (
+            f"KOI DR25 ({ld_row['koi_ldm_coeff1']:.4f}, {ld_row['koi_ldm_coeff2']:.4f}), tính cho Teff = {ld_row['koi_steff']:.0f} K, "
+            f"logg = {ld_row['koi_slogg']:.2f}, [Fe/H] = {ld_row['koi_smet']:+.2f}"
+        )
+    print(f"Hệ số tối rìa: {LIMB_DARKENING_SOURCE}")
+
+    if args.ephemeris and archive_planets:
+        p_man, t0_man, t14_man = args.ephemeris
+        arc = min(archive_planets, key=lambda row: abs(row["pl_orbper"] - p_man))
+        if not (arc.get("pl_tranmid") and arc.get("pl_trandur")):
+            print(f"NASA thiếu T0/T14 của {arc['pl_name']} → dùng ephemeris tự đo: P = {p_man}, T0 = {t0_man} BKJD, T14 = {t14_man} giờ")
+            arc["pl_tranmid"], arc["pl_trandur"] = t0_man + BKJD_OFFSET, t14_man
+            arc["ephemeris_source"] = "tự đo trong light curve (NASA thiếu T0/T14)"
+
     if args.verify_archive:
         for arc in archive_planets:
             if not arc.get("tran_flag") or any(abs(d["period"] - arc["pl_orbper"]) / arc["pl_orbper"] < 0.01 for d in detections):
@@ -501,7 +550,9 @@ def main():
         m = p["rho_star"] * 4 / 3 * math.pi * (rs * R_SUN) ** 3 / M_SUN
         sigma = 3 * m * p["a_rs_err"] / p["a_rs"]
         p["ms_transit"], p["ms_transit_err"] = m, sigma
-        if 0.1 < m < 5 and 0 < sigma < m:
+        # Chỉ nhận khi sai số < 20%: hành tinh chu kỳ dài chỉ 2–3 transit (vd. Kepler-1625 b, 1708 b) có a/Rs
+        # suy biến với tham số va chạm b, cho Ms lệch xa (0.18 M☉ thay vì ~1) mà sai số vẫn "nhỏ hơn giá trị".
+        if 0.1 < m < 5 and 0 < sigma < 0.2 * m:
             estimates.append((m, sigma))
     if estimates:
         weights = [1 / s**2 for _, s in estimates]
@@ -627,7 +678,8 @@ def main():
         plt.close()
 
     # ---- 6. Khoảng cách ----
-    gaia = fetch_gaia(header["RA_OBJ"], header["DEC_OBJ"], header["KEPMAG"])
+    gaia = fetch_gaia_cached(name, header["RA_OBJ"], header["DEC_OBJ"], header["KEPMAG"],
+                             archive_planets[0] if archive_planets else {})
     abs_mag = 4.74 - 2.5 * math.log10(lum)
     d_phot = 10 ** ((header["KEPMAG"] - abs_mag + 5) / 5)
     d_pc = 1000 / gaia["parallax"] if gaia else d_phot
@@ -644,9 +696,17 @@ def main():
     )
     for p in planets:
         if p.get("source") == "verify":
+            if p["n_transits"] < MIN_TRANSITS:
+                why = f"chỉ có {p['n_transits']} transit trong dữ liệu, ít hơn {MIN_TRANSITS} lần BLS yêu cầu"
+            elif p["duration"] > max(BLS_DURATIONS):
+                why = (f"transit dài {p['duration'] * 24:.0f} giờ, vượt thời lượng dài nhất BLS thử "
+                       f"({max(BLS_DURATIONS) * 24:.0f} giờ)")
+            else:
+                why = "quá yếu (đỉnh periodogram mạnh nhất là nhiễu)"
+            src = (p.get("archive") or {}).get("ephemeris_source", "đã công bố")
             lines += ["", (
-                f"⚠️ **{p['name']}** quá yếu để BLS tự tìm (đỉnh periodogram mạnh nhất là nhiễu). Khi gấp pha đúng "
-                f"P, T0 đã công bố: SNR = {p['snr']:.1f}, {p['n_transits']} transit. Phép thử báo động giả: "
+                f"⚠️ BLS không tự tìm ra **{p['name']}**: {why}. Khi gấp pha đúng "
+                f"P, T0 ({src}): SNR = {p['snr']:.1f}, {p['n_transits']} transit. Phép thử báo động giả: "
                 f"**{p['false_alarm'] * 100:.2f}%** trong {p['fake_trials']} lần chọn bừa P, T0 cũng cho SNR cao bằng. "
                 f"Xem `{name}_{slug(p['name'])}_transits.png`."
             )]
@@ -660,6 +720,7 @@ def main():
         ("Khối lượng từ logg (KIC)", f"{ms_logg:.3f} M☉", arc0.get("st_mass")),
         ("Khối lượng dùng cho tính toán", f"{ms:.3f}" + (f" ± {ms_err:.3f} M☉ (từ mật độ transit)" if ms_err else " M☉ (từ logg)"), arc0.get("st_mass")),
         ("Độ sáng L", f"{lum:.2f} L☉", None),
+        ("Hệ số tối rìa (u1, u2) dùng khi khớp", LIMB_DARKENING_SOURCE, None),
         ("Độ kim loại [Fe/H] (KIC)", f"{feh} dex" + (f" (kim loại gấp ~{10 ** float(feh):.1f} lần Mặt Trời)" if feh not in (None, "None") else ""), arc0.get("st_met")),
         ("Tuổi", f"{age} tỷ năm (NASA)" if age else "—", None),
     ]
@@ -669,9 +730,11 @@ def main():
     lines += ["", "## Khoảng cách từ Trái Đất", ""]
     if gaia:
         d_err = d_pc * gaia["parallax_error"] / gaia["parallax"]
+        ruwe = f", RUWE = {gaia['ruwe']:.2f} (< 1.4 là đáng tin)" if gaia.get("ruwe") is not None else ""
         lines.append(
-            f"- **Thị sai Gaia DR3** (nguồn {gaia['source_id']}): {gaia['parallax']:.4f} ± {gaia['parallax_error']:.4f} mas, "
-            f"RUWE = {gaia['ruwe']:.2f} (< 1.4 là đáng tin) → **{d_pc:.1f} ± {d_err:.1f} pc ≈ {d_pc * PC_TO_LY:.0f} năm ánh sáng**"
+            f"- **Thị sai Gaia DR3** (sao {gaia['source_id']}; lấy từ {gaia.get('source', 'Gaia DR3')}): "
+            f"{gaia['parallax']:.4f} ± {gaia['parallax_error']:.4f} mas{ruwe} → "
+            f"**{d_pc:.1f} ± {d_err:.1f} pc ≈ {d_pc * PC_TO_LY:.0f} năm ánh sáng**"
         )
     lines.append(f"- Ước tính bằng độ sáng (M = {abs_mag:.2f}, Kp = {header['KEPMAG']:.2f}): ~{d_phot:.0f} pc (thô, không tính bụi)")
     if arc0.get("sy_dist"):
@@ -751,13 +814,34 @@ def main():
                 f"{koi['koi_period']:.4f} | {koi.get('koi_prad')} | {found} |"
             )
 
+    # Ảnh minh họa (cùng thư mục outputs/ nên đường dẫn tương đối chỉ là tên file).
+    # Sơ đồ hệ, vệ tinh, khí quyển do bước 3–5 vẽ: nếu chưa chạy các bước đó thì link tạm thời chưa có ảnh.
+    figures = [
+        ("Light curve đã làm phẳng (mọi quý)", f"{name}_lightcurve.png"),
+        ("Periodogram BLS từng vòng tìm kiếm", f"{name}_periodogram.png"),
+    ]
+    if fitted:
+        figures.append(("Transit gấp pha và mô hình batman của từng hành tinh", f"{name}_folded.png"))
+    figures += [(f"{p['name']}: từng transit riêng lẻ và phép thử báo động giả", f"{name}_{slug(p['name'])}_transits.png")
+                for p in fitted if p.get("source") == "verify"]
+    figures += [
+        ("Sơ đồ hệ (bước 3, `03_diagram.py`)", f"{name}_diagram.png"),
+        ("Tìm vệ tinh: O − C và vùng vai OSE (bước 4, `04_moons.py`, chi tiết trong `" + f"{name}_moons.md`)", f"{name}_moons.png"),
+        ("Khí quyển: nhật thực phụ Kepler và phổ đã công bố (bước 5, `05_atmosphere.py`, chi tiết trong `"
+         + f"{name}_atmosphere.md`)", f"{name}_atmosphere.png"),
+    ]
+    lines += ["", "## Hình ảnh", ""]
+    for caption, file in figures:
+        lines += [f"### {caption}", "", f"![{caption}]({file})", ""]
+
     report = "\n".join(lines) + "\n"
     (OUT_DIR / f"{name}_report.md").write_text(report, encoding="utf-8")
 
     # ---- 8. JSON cho sơ đồ ----
     system = {
         "target": args.target,
-        "star": {"teff": teff, "radius_rsun": rs, "mass_msun": ms, "lum_lsun": lum, "distance_pc": d_pc},
+        "star": {"teff": teff, "radius_rsun": rs, "mass_msun": ms, "lum_lsun": lum, "distance_pc": d_pc,
+                 "logg": logg, "kepmag": header["KEPMAG"], "limb_darkening": LIMB_DARKENING},
         "planets": [
             {
                 "name": p["name"],

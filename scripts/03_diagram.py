@@ -85,23 +85,50 @@ def main():
 
     name = args.target.replace(" ", "").replace("-", "")
     system = json.loads((OUT_DIR / f"{name}_system.json").read_text(encoding="utf-8"))
+    out = draw_diagram(system, OUT_DIR / f"{name}_diagram.png", Time(args.date) if args.date else Time.now())
+    print(f"Sơ đồ: {out}")
+
+
+# Hành tinh có thêm khóa "status" (dùng ở bước 6 cho các hệ bị tranh cãi): "refuted" = từng công bố rồi bị bác,
+# "candidate" = ứng viên chưa xác nhận. Không có khóa này = hành tinh đã xác nhận.
+STATUS_STYLE = {
+    "refuted": {"color": "#9a9a9a", "ls": ":", "mark": " ✗", "alpha": 0.45},
+    "candidate": {"color": None, "ls": "-.", "mark": " ?", "alpha": 0.6},
+}
+
+
+def draw_diagram(system: dict, out: Path, when: Time) -> Path:
     star, planets = system["star"], system["planets"]
     rs_au = star["radius_rsun"] * R_SUN_AU
     rs_earth = star["radius_rsun"] * R_SUN_EARTH
     hz_in, hz_out = habitable_zone(star["lum_lsun"], star["teff"])
-    when = Time(args.date) if args.date else Time.now()
     now_bkjd = when.jd - BKJD_OFFSET
+
+    def style(i, p):
+        """(màu, kiểu nét, nhãn ngắn, độ đậm) của hành tinh thứ i."""
+        st = STATUS_STYLE.get(p.get("status"))
+        base = PLANET_COLORS[i % len(PLANET_COLORS)]
+        label = p.get("label") or p["name"].split()[-1]
+        if not st:
+            return base, "-" if p["transiting"] else "--", label, 1 if p["radius_measured"] else 0.5
+        return st["color"] or base, st["ls"], label + st["mark"], st["alpha"]
 
     fig = plt.figure(figsize=(16, 10))
     grid = fig.add_gridspec(2, 2, width_ratios=[1.15, 1], height_ratios=[1, 1])
     ax_orbit = fig.add_subplot(grid[:, 0])
     ax_size = fig.add_subplot(grid[0, 1])
     ax_dist = fig.add_subplot(grid[1, 1])
+    n_conf = sum(1 for p in planets if not p.get("status"))
+    n_ref = sum(1 for p in planets if p.get("status") == "refuted")
+    n_cand = sum(1 for p in planets if p.get("status") == "candidate")
+    count = f"{n_conf} hành tinh" + (f" + {n_cand} ứng viên (?)" if n_cand else "") + (f" + {n_ref} bị bác (✗)" if n_ref else "")
     fig.suptitle(
-        f"Hệ {system['target']}: cách Trái Đất {star['distance_pc']:.0f} pc ≈ "
-        f"{star['distance_pc'] * 3.2616:.0f} năm ánh sáng · {len(planets)} hành tinh",
+        f"Hệ {system['target']}: cách Trái Đất {star['distance_pc']:.1f} pc ≈ "
+        f"{star['distance_pc'] * 3.2616:.{0 if star['distance_pc'] > 30 else 1}f} năm ánh sáng · {count}",
         fontsize=15, fontweight="bold",
     )
+    if system.get("notes"):
+        fig.text(0.01, 0.005, "\n".join(system["notes"]), fontsize=9, va="bottom", color="#333333")
 
     # ---- A. Nhìn từ trên xuống, bán kính quỹ đạo theo log ----
     # Tọa độ bán kính ρ = 1 + log10(a / Rs): bề mặt sao ở ρ = 1, mỗi vòng xa hơn = xa gấp 10 lần.
@@ -120,18 +147,18 @@ def main():
     ax_orbit.text(0, -(rho(hz_in) + rho(hz_out)) / 2, "vùng có thể sống", ha="center", fontsize=8, color="#2ca02c")
 
     for i, p in enumerate(planets):
-        color = PLANET_COLORS[i % len(PLANET_COLORS)]
+        color, ls, label, alpha = style(i, p)
         r = rho(p["a_au"])
-        ax_orbit.add_patch(Circle((0, 0), r, fill=False, color=color, lw=1.2, ls="-" if p["transiting"] else "--"))
-        if p["t0_bkjd"] is not None:
+        ax_orbit.add_patch(Circle((0, 0), r, fill=False, color=color, lw=1.2, ls=ls))
+        if p.get("t0_bkjd") is not None:
             # Lúc transit hành tinh nằm giữa sao và Trái Đất; Trái Đất ở phía dưới hình (góc −90°)
             angle = -math.pi / 2 + 2 * math.pi * ((now_bkjd - p["t0_bkjd"]) / p["period_days"] % 1)
         else:
             angle = math.pi / 4 + i * 0.5  # không biết thời điểm: đặt tùy ý
         x, y = r * math.cos(angle), r * math.sin(angle)
         size = 0.09 * log_size(p["radius_earth"] or 1)
-        ax_orbit.add_patch(Circle((x, y), size, color=color, zorder=5, alpha=1 if p["radius_measured"] else 0.5))
-        ax_orbit.annotate(p["name"].split()[-1], (x, y), xytext=(6, 6), textcoords="offset points", fontsize=11, fontweight="bold", color=color)
+        ax_orbit.add_patch(Circle((x, y), size, color=color, zorder=5, alpha=alpha))
+        ax_orbit.annotate(label, (x, y), xytext=(6, 6), textcoords="offset points", fontsize=11, fontweight="bold", color=color)
     ax_orbit.annotate("", xy=(0, -outer), xytext=(0, -outer + 0.5), arrowprops=dict(arrowstyle="->", color="black"))
     ax_orbit.text(0.05, -outer + 0.1, "hướng về Trái Đất", fontsize=8)
     ax_orbit.set_xlim(-outer, outer)
@@ -140,24 +167,25 @@ def main():
     ax_orbit.axis("off")
     ax_orbit.set_title(
         f"Quỹ đạo nhìn từ trên xuống, ngày {when.datetime.strftime('%d/%m/%Y')}\n"
-        "bán kính theo log: mỗi vòng chấm = xa gấp 10 lần · nét đứt = không có transit",
+        "bán kính theo log: mỗi vòng chấm = xa gấp 10 lần · nét đứt = không có transit"
+        + ("\nchấm chấm xám ✗ = bị bác · gạch chấm ? = ứng viên" if n_ref or n_cand else ""),
         fontsize=10,
     )
 
     # ---- B. So sánh kích thước, đường kính theo log ----
-    bodies = [(f"Sao mẹ\n{rs_earth:.0f} R⊕", rs_earth, star_color(star["teff"]), True)]
-    bodies += [
-        (f"{p['name'].split()[-1]}\n{p['radius_earth']:.2f} R⊕" + ("" if p["radius_measured"] else "\n(ước tính)"),
-         p["radius_earth"], PLANET_COLORS[i % len(PLANET_COLORS)], p["radius_measured"])
-        for i, p in enumerate(planets) if p["radius_earth"]
-    ]
-    bodies += [(f"{n}\n{r:g} R⊕", r, "#dddddd", True) for n, r in REFERENCE_SIZES]
+    bodies = [(f"Sao mẹ\n{rs_earth:.0f} R⊕", rs_earth, star_color(star["teff"]), 1)]
+    for i, p in enumerate(planets):
+        if p["radius_earth"]:
+            color, _, label, alpha = style(i, p)
+            bodies.append((f"{label}\n{p['radius_earth']:.2f} R⊕" + ("" if p["radius_measured"] else "\n(ước tính)"),
+                           p["radius_earth"], color, alpha))
+    bodies += [(f"{n}\n{r:g} R⊕", r, "#dddddd", 1) for n, r in REFERENCE_SIZES]
     x = 0.0
-    for label, r, color, measured in bodies:
+    for label, r, color, alpha in bodies:
         d = log_size(r)
         x += d / 2
-        ax_size.add_patch(Circle((x, d / 2), d / 2, color=color, ec="black", lw=0.6, alpha=1 if measured else 0.5))
-        ax_size.text(x, -0.25, label, ha="center", va="top", fontsize=7.5)
+        ax_size.add_patch(Circle((x, d / 2), d / 2, color=color, ec="black", lw=0.6, alpha=alpha))
+        ax_size.text(x, -0.25, label, ha="center", va="top", fontsize=7.5 if len(bodies) <= 9 else 6.3)
         x += d / 2 + 0.7
     ax_size.set_xlim(-0.2, x)
     ax_size.set_ylim(-1.3, 3.6)
@@ -169,11 +197,13 @@ def main():
     ax_dist.axvspan(hz_in, hz_out, ymin=0.5, ymax=1, color="#2ca02c", alpha=0.15, label="vùng có thể sống")
     ax_dist.axvspan(1e-4, rs_au, color=star_color(star["teff"]), ec="#e0a000", label="bên trong sao mẹ")
     for i, p in enumerate(planets):
-        ax_dist.scatter(p["a_au"], 1, s=60 * log_size(p["radius_earth"] or 1) ** 2, color=PLANET_COLORS[i % len(PLANET_COLORS)], zorder=3)
+        color, _, label, alpha = style(i, p)
+        ax_dist.scatter(p["a_au"], 1, s=60 * log_size(p["radius_earth"] or 1) ** 2, color=color, alpha=alpha, zorder=3)
+        teq = f"\n{p['teq_k']:.0f} K" if p.get("teq_k") else ""
         ax_dist.annotate(
-            f"{p['name'].split()[-1]}\n{p['a_au']:.3f} AU\n{p['teq_k']:.0f} K",
+            f"{label}\n{p['a_au']:.3g} AU{teq}",
             # Nhãn so le trên/dưới để hai hành tinh gần nhau không đè chữ lên nhau
-            (p["a_au"], 1), xytext=(0, 14 if i % 2 == 0 else -14), textcoords="offset points",
+            (p["a_au"], 1), xytext=(0, (14 if i % 2 == 0 else -14) * (1 if len(planets) <= 4 or i % 4 < 2 else 3.6)), textcoords="offset points",
             ha="center", va="bottom" if i % 2 == 0 else "top", fontsize=8,
         )
     ax_dist.axvspan(0.95, 1.67, ymin=0, ymax=0.5, color="#2ca02c", alpha=0.15)
@@ -193,10 +223,10 @@ def main():
     ax_dist.set_title("Khoảng cách tới sao mẹ so với Hệ Mặt Trời (kích thước chấm theo log bán kính)", fontsize=10)
     ax_dist.grid(axis="x", which="major", alpha=0.3)
 
-    plt.tight_layout()
-    out = OUT_DIR / f"{name}_diagram.png"
+    plt.tight_layout(rect=(0, 0.06 if system.get("notes") else 0, 1, 0.95))
     plt.savefig(out, dpi=130)
-    print(f"Sơ đồ: {out}")
+    plt.close(fig)
+    return out
 
 
 if __name__ == "__main__":

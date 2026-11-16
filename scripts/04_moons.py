@@ -304,6 +304,8 @@ def main():
     name = analyze.slug(args.target)
     system = json.loads((OUT_DIR / f"{name}_system.json").read_text(encoding="utf-8"))
     star = system["star"]
+    if star.get("limb_darkening"):  # mẫu transit phải dùng đúng hệ số tối rìa đã dùng khi khớp ở bước 2
+        analyze.LIMB_DARKENING = star["limb_darkening"]
     data = np.loadtxt(CSV_DIR / f"{name}_all_flat.csv", delimiter=",", skiprows=1)
     t, flux, err = data[:, 0], data[:, 1], data[:, 2]
     cadence = float(np.median(np.diff(t)))  # nhịp đo thật: 29.4244 phút (khác một chút so với thời gian phơi sáng)
@@ -391,7 +393,8 @@ def main():
     plt.close()
 
     # ---- Báo cáo ----
-    lines = [f"# Tìm vệ tinh quanh các hành tinh của {args.target}", ""]
+    lines = [f"# Tìm vệ tinh quanh các hành tinh của {args.target}", "",
+             f"![O − C (trái) và vùng vai OSE (phải) của từng hành tinh]({name}_moons.png)", ""]
     lines.append(
         "Light curve Kepler chỉ đặt được **giới hạn trên**: vệ tinh lớn/nặng hơn mức này đã bị loại. "
         "Giả định vệ tinh đá (mật độ 3 g/cm³), quỹ đạo tròn, cùng chiều; giới hạn tính cho vệ tinh ở xa nhất "

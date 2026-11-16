@@ -37,11 +37,16 @@ def slug(name: str) -> str:
     return name.replace(" ", "").replace("-", "")
 
 
-def known_transit_mask(host: str, time_bkjd: np.ndarray) -> np.ndarray:
+def known_transit_mask(host: str, time_bkjd: np.ndarray, manual=None) -> np.ndarray:
     """True ở các điểm nằm trong transit (±T14, tức gấp đôi thời lượng) của hành tinh đã biết trên NASA.
-    Bộ lọc làm phẳng bỏ qua các điểm này khi vẽ đường xu hướng, nên không "là phẳng" mất một phần transit."""
+    Bộ lọc làm phẳng bỏ qua các điểm này khi vẽ đường xu hướng, nên không "là phẳng" mất một phần transit.
+
+    manual = (P ngày, T0 BKJD, T14 giờ): dùng khi NASA thiếu T0/T14 (vd. Kepler-1708 b chỉ có P)."""
     query = f"select pl_name,pl_orbper,pl_tranmid,pl_trandur from pscomppars where hostname='{host}' and tran_flag=1"
     rows = requests.get(ARCHIVE_URL, params={"query": query, "format": "json"}, timeout=60).json()
+    if manual:
+        rows.append({"pl_name": "ephemeris tự nhập", "pl_orbper": manual[0],
+                     "pl_tranmid": manual[1] + BKJD_OFFSET, "pl_trandur": manual[2]})
     mask = np.zeros_like(time_bkjd, dtype=bool)
     for row in rows:
         if not (row["pl_orbper"] and row["pl_tranmid"] and row["pl_trandur"]):
@@ -66,6 +71,10 @@ def main():
     parser.add_argument(
         "--mask-known", action="store_true",
         help="Che transit của các hành tinh đã biết (lấy P, T0, T14 từ NASA) khi làm phẳng, để không làm nông transit",
+    )
+    parser.add_argument(
+        "--ephemeris", type=float, nargs=3, metavar=("P", "T0_BKJD", "T14_GIO"),
+        help="Thêm một hành tinh cần che khi NASA thiếu T0/T14 (dùng cùng --mask-known)",
     )
     args = parser.parse_args()
 
@@ -108,7 +117,7 @@ def main():
     # Ghép tất cả các quý, chuẩn hóa về 1, làm phẳng để loại biến thiên chậm của sao, bỏ điểm ngoại lai.
     # remove_outliers chỉ cắt phía trên (sigma_upper) để không xóa nhầm chính các điểm transit.
     lc = collection.stitch().remove_nans()
-    mask = known_transit_mask(args.target, lc.time.value) if args.mask_known else None
+    mask = known_transit_mask(args.target, lc.time.value, args.ephemeris) if args.mask_known else None
     lc = lc.flatten(window_length=args.flatten_window, mask=mask).remove_outliers(sigma_upper=4, sigma_lower=20)
     flat_path = CSV_DIR / f"{name}_all_flat.csv"
     with open(flat_path, "w", encoding="utf-8") as f:
