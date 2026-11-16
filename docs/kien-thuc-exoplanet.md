@@ -12,6 +12,7 @@ Sổ tay ghi lại các khái niệm khi học săn exoplanet. Được cập nh
 6. [Bảng thuật ngữ nhanh](#6-bảng-thuật-ngữ-nhanh)
 7. [Từ transit tính ra được gì?](#7-từ-transit-tính-ra-được-gì)
 8. [Thực hành: tải dữ liệu, vẽ và tính thông số](#8-thực-hành-tải-dữ-liệu-vẽ-và-tính-thông-số)
+9. [Code xử lý chi tiết từng bước](#9-code-xử-lý-chi-tiết-từng-bước)
 
 ---
 
@@ -689,3 +690,152 @@ Bán kính hành tinh lệch khoảng 10% **hoàn toàn do bán kính sao**: KIC
 Sao mẹ: loại G, 0.89 M☉, 1.06 R☉, [Fe/H] = −0.15, tuổi ~10.6 tỷ năm, cách Trái Đất **186 pc ≈ 607 năm ánh sáng** (thị sai Gaia 5.37 mas).
 
 Kepler-10 b nóng gần 2.000 K, bề mặt có thể là biển dung nham. Kepler-10 c nặng gấp 11 lần Trái Đất mà bán kính chỉ 2.2 lần, đặc như đá nhưng vẫn quá lớn để là đá thuần.
+
+## 9. Code xử lý chi tiết từng bước
+
+Mục 7 giải thích **công thức**, mục 8.1 giải thích **cách chạy**. Mục này mô tả **bên trong code làm gì**: dữ liệu đi qua những bước nào, mỗi bước dùng tham số gì và vì sao chọn như vậy. Số hiệu dòng ở dạng `file:dòng` để mở thẳng tới chỗ đó.
+
+### 9.1. Luồng dữ liệu
+
+```
+MAST (FITS Kepler)          NASA Exoplanet Archive         Gaia DR3
+      │                       (pscomppars, KOI DR25)      (thị sai)
+      ▼                               │                       │
+01_download.py ──► data/raw/*.fits    │                       │
+      │        ──► <sao>_star_header.csv (Teff, Rs, logg, [Fe/H], RA/Dec, Kp)
+      │        ──► <sao>_Q2_raw.csv (1 quý thô, cho Sheets)
+      ▼                               │                       │
+<sao>_all_flat.csv (mọi quý, đã làm phẳng)                    │
+      │                               ▼                       ▼
+02_analyze.py ─────────────────────────────────────────────────┘
+      │  ──► outputs/<sao>_lightcurve.png, _periodogram.png, _folded.png, _report.md
+      │  ──► data/csv/<sao>_<hành tinh>_folded.csv
+      ▼
+outputs/<sao>_system.json (sao + mọi hành tinh)
+      │                    │
+      ▼                    ▼
+03_diagram.py        04_moons.py (đọc thêm _all_flat.csv, dùng lại hàm của 02_analyze.py)
+_diagram.png         _moons.png, _moons.md, _transit_times.csv, _ose_profile.csv
+```
+
+Mỗi bước chỉ đọc file do bước trước ghi ra, nên chạy lại riêng một bước được (vd. chỉ vẽ lại sơ đồ với `--date` khác) mà không phải tải lại dữ liệu.
+
+### 9.2. Bước 1: tải và làm sạch dữ liệu (`01_download.py`)
+
+| Việc | Cách làm trong code | Vì sao |
+|---|---|---|
+| Tìm dữ liệu | `lk.search_lightcurve(tên, author="Kepler", cadence="long")` (`scripts/01_download.py:77`) | Chỉ lấy sản phẩm chính thức của pipeline Kepler, nhịp 29.4 phút. Không lấy K2/TESS |
+| Tải | `download_all` vào `data/raw/`, mỗi quý 1 file FITS | Lightkurve tự bỏ các điểm có cờ chất lượng xấu (`quality_bitmask="default"`) và dùng cột **PDCSAP_FLUX** (đã khử sai số hệ thống của thiết bị) |
+| Thông tin sao | Đọc 9 khóa header của file đầu tiên: `OBJECT, KEPLERID, RA_OBJ, DEC_OBJ, KEPMAG, TEFF, LOGG, FEH, RADIUS` | Đây là giá trị danh mục KIC, khá thô (mục 3.1) |
+| CSV 1 quý cho Sheets | Lấy quý `--sheet-quarter` (mặc định Q2), giữ dòng `QUALITY = 0` và flux không NaN, chia cho trung vị | Q0 chỉ dài ~10 ngày; Q2 đủ ~90 ngày, ~3.400 dòng, vừa sức Google Sheets |
+| Ghép các quý | `collection.stitch()` | Mỗi quý được **chia cho trung vị của chính nó** rồi mới nối, vì mỗi quý sao rơi vào CCD khác nên độ sáng tuyệt đối lệch nhau |
+| Che transit đã biết (tùy chọn `--mask-known`) | Hỏi NASA `pl_orbper, pl_tranmid, pl_trandur`, đánh dấu điểm có \|pha\| < T14 (tức cửa sổ rộng gấp đôi transit) | Bộ lọc làm phẳng bỏ qua các điểm này khi vẽ đường xu hướng, nên không "là phẳng" mất một phần transit |
+| Làm phẳng | `flatten(window_length=901)`: bộ lọc **Savitzky–Golay** bậc 2, cửa sổ 901 điểm ≈ 18 ngày (49 điểm ≈ 1 ngày), lặp 3 lần loại điểm lệch 3σ khi tính xu hướng | Khử biến thiên chậm của sao (vết đen, dao động) mà vẫn giữ transit dài vài giờ. Cửa sổ phải ≥ 3 lần transit dài nhất |
+| Bỏ điểm ngoại lai | `remove_outliers(sigma_upper=4, sigma_lower=20)` | Chỉ cắt điểm **sáng** bất thường (tia vũ trụ, lóa). Phía dưới để 20σ để **không xóa nhầm chính các điểm transit** |
+| Kết quả | `<sao>_all_flat.csv`: `time_bkjd, flux, flux_err`, ~52.000–65.000 dòng cho 4 năm | Đầu vào của bước 2 và 4 |
+
+### 9.3. Bước 2: tìm hành tinh và tính thông số (`02_analyze.py`)
+
+**a) Lưới chu kỳ cho BLS** (`scripts/02_analyze.py:121`). Không dùng bước đều, mà mỗi bước nhảy tỉ lệ với thời lượng transit dự kiến:
+
+$$P_{i+1} = P_i\left(1 + \frac{0.5\,D(P_i)}{\text{độ dài dữ liệu}}\right), \qquad D(P) = 0.05\left(\frac{P}{0.5}\right)^{1/3}\ \text{ngày}$$
+
+Thời lượng transit tăng theo $P^{1/3}$ (vì a ∝ P^{2/3}, vận tốc ∝ P^{−1/3}), nên chu kỳ dài cho phép bước thưa hơn. Khoảng tìm: `--min-period` (0.5 ngày) tới `min(--max-period (100), độ dài dữ liệu / 3)` để mỗi hành tinh có ít nhất 3 transit. Thời lượng thử: 0.03 – 0.6 ngày (0.7 – 14 giờ), bỏ giá trị ≥ chu kỳ nhỏ nhất.
+
+**b) BLS lặp** (`scripts/02_analyze.py:132`, thuật toán ở mục 7.6):
+- `BoxLeastSquares.power(..., objective="snr")`: periodogram là **SNR của độ sâu** (độ sâu / sai số độ sâu) tại mỗi chu kỳ, thay cho mặc định log-likelihood.
+- SDE = (đỉnh − trung bình) / độ lệch chuẩn của cả periodogram.
+- Đạt đủ 3 ngưỡng (SDE ≥ 9, SNR ≥ 10, ≥ 3 transit có dữ liệu) mới nhận là hành tinh.
+- **Tinh chỉnh**: chạy lại BLS trên 3.000 chu kỳ trong ±0.05% quanh đỉnh.
+- **Che**: bỏ các điểm trong cửa sổ 1.5 × thời lượng quanh mỗi transit vừa tìm, rồi lặp. Tối đa 8 hành tinh.
+
+**c) Kiểm chứng tín hiệu yếu** (`--verify-archive`, `scripts/02_analyze.py:173`): với hành tinh có transit trên NASA mà BLS không tìm ra (chu kỳ lệch > 1% so với mọi hành tinh đã tìm), đo SNR tại đúng P, T0, T14 công bố. Phép thử báo động giả: 3.000 lần chọn P ngẫu nhiên trong ±30% và T0 ngẫu nhiên, chỉ tính những lần có đủ số transit, rồi đếm tỉ lệ cho SNR ≥ tín hiệu thật.
+
+**d) Khớp mô hình từng hành tinh** (`scripts/02_analyze.py:205`). Trước khi khớp, **che transit của mọi hành tinh khác** (điểm có \|pha\| < 0.75 × thời lượng của chúng). Hai tầng:
+
+| Tầng | Mô hình | Tham số khớp | Dữ liệu dùng | Mục đích |
+|---|---|---|---|---|
+| 1 | Hình thang, lấy trung bình 15 vị trí trong 29.4 phút phơi sáng | độ sâu, T14, thời gian ingress, độ lệch tâm | \|pha\| < max(3 × thời lượng BLS, 0.3 ngày) | Giá trị khởi đầu ổn định. Nếu T14 trôi ra ngoài 0.5–2 lần thời lượng BLS thì kéo về |
+| 2 | `batman`: tối rìa bậc hai u = (0.40, 0.26), quỹ đạo tròn, supersample 7 trong 29.4 phút | ΔT0, k = Rp/Rs, a/Rs, b (chu kỳ giữ cố định) | \|pha\| < max(1.5 × T14, 0.15 ngày) | Thông số vật lý (mục 7.2) |
+
+Giới hạn khi khớp batman: ΔT0 trong ±0.05 ngày, k trong 0.3–2 lần √(độ sâu), a/Rs trong 1.5–1000, b trong 0–1; tối đa 5.000 lần lặp (tín hiệu yếu như Kepler-452b cần nhiều). Giá trị khởi đầu a/Rs ≈ P/(π·T14), tức công thức khi b = 0. Sai số a/Rs lấy từ **ma trận hiệp phương sai** của `curve_fit`; từ đó suy ra i, T14, độ sâu và mật độ sao ρ* (mục 7.1).
+
+**e) Khối lượng sao dùng cho cả hệ** (`scripts/02_analyze.py:499`). Mỗi hành tinh cho một giá trị Ms = ρ* × thể tích sao (Rs của KIC), sai số σ_Ms = 3·Ms·σ_(a/Rs)/(a/Rs). Chỉ nhận giá trị trong 0.1–5 M☉ và sai số nhỏ hơn chính nó, rồi lấy **trung bình có trọng số 1/σ²**. Không hành tinh nào đạt thì dùng Ms từ logg của KIC.
+
+**f) Thông số vật lý từng hành tinh.** Rp = k·Rs; a theo Kepler 3; Teq với albedo 0.3; bức xạ S; vận tốc quỹ đạo; xác suất transit Rs/a. **Khối lượng** chọn theo thứ tự ưu tiên:
+1. Có biên độ RV `pl_rvamp` trên NASA → tự tính Mp từ K, dùng Ms và i **của chính script**.
+2. Có `pl_bmasse` với `pl_bmassprov = "Mass"` (đo thật) → dùng nguyên.
+3. Không có → để trống, ghi kèm ước tính từ bán kính (Chen & Kipping, mục 7.4).
+
+**g) Hành tinh không có transit.** Mọi hành tinh trên NASA chưa khớp với hành tinh nào script tìm được (chu kỳ lệch > 1%) được thêm vào bảng. Khối lượng từ RV tính với i = 90° nên là **khối lượng tối thiểu**; bán kính chỉ ước tính ngược từ khối lượng.
+
+**h) Thành phần** (`scripts/02_analyze.py:352`, công thức mục 7.5): Mp > 50 M⊕ hoặc Rp > 8 R⊕ → coi là khí khổng lồ (Thorngren); còn lại so với các đường sắt 0.86·M^0.27, đá 1.07·M^0.27, 50% nước 1.24·M^0.27 (Zeng), có lớp khí thì giải ngược tỉ lệ khí (Lopez & Fortney) với tuổi sao lấy từ NASA, không có thì giả định 5 tỷ năm.
+
+**i) Khoảng cách** (`scripts/02_analyze.py:281`): truy vấn Gaia DR3 các sao trong bán kính 5″ quanh RA/Dec của header, chỉ giữ sao có thị sai và cấp sao G lệch cấp sao Kepler < 1.5 (tránh nhầm sao bên cạnh), lấy sao gần nhất. d = 1000/ϖ. Không có Gaia thì dùng khoảng cách ước tính từ độ sáng.
+
+**j) Đối chiếu.** Hành tinh tự tìm khớp với hành tinh NASA hoặc KOI nếu chu kỳ lệch < 1%. Bảng KOI DR25 truy vấn theo `KEPLERID` trong header.
+
+**k) Ảnh và CSV.**
+- `_lightcurve.png`: toàn bộ dữ liệu đã làm phẳng.
+- `_periodogram.png`: periodogram từng vòng BLS (đen = tìm thấy, xám = chỉ còn nhiễu).
+- `_folded.png` + `_folded.csv`: gấp pha trong ±max(1.5 × T14, 0.1 ngày), chia 60 bin, mỗi bin lấy **trung vị** (cần ≥ 3 điểm), vẽ kèm đường mô hình batman.
+- `_<hành tinh>_transits.png/.csv` (chỉ hành tinh kiểm chứng): từng transit trong cửa sổ ±1.5 ngày + histogram SNR của các lần chọn bừa.
+- `_system.json`: số liệu cả hệ cho bước 3 và 4 (thêm k, a/Rs, b, T14, độ sâu để bước 4 dựng lại mô hình transit).
+
+### 9.4. Bước 3: vẽ sơ đồ hệ (`03_diagram.py`)
+
+Chỉ đọc `_system.json`, không tính lại gì. Quy đổi log ở mục 7.7. Chi tiết thêm:
+- **Vị trí hành tinh** theo ngày `--date` (mặc định hôm nay): góc = −90° + 360° × ((ngày − T0)/P mod 1), Trái Đất ở phía dưới hình. Hành tinh không có T0 (không transit) thì đặt góc tùy ý.
+- **Vùng có thể sống** theo Kopparapu 2013 với Teff kẹp trong 2.600–7.200 K (ngoài khoảng này công thức không còn đúng).
+- **Màu sao** theo Teff: > 7.500 K xanh trắng, 6.000–7.500 trắng, 5.200–6.000 vàng, 3.700–5.200 cam, < 3.700 đỏ cam.
+- Quỹ đạo nét đứt = hành tinh không có transit; hành tinh mờ = bán kính chỉ là ước tính.
+
+### 9.5. Bước 4: tìm vệ tinh (`04_moons.py`)
+
+Dùng lại hằng số, mô hình batman và hàm gấp pha của `02_analyze.py` (import bằng `importlib` vì tên file bắt đầu bằng số). Nhịp đo lấy bằng trung vị khoảng cách giữa 2 điểm liên tiếp: **29.4244 phút**, khác một chút so với 29.4 phút phơi sáng. Chỉ xét hành tinh có transit đã khớp mô hình; transit của các hành tinh khác bị che như ở bước 2.
+
+**a) Vùng vệ tinh** (`scripts/04_moons.py:55`): khối lượng hành tinh lấy giá trị đo, không có thì ước tính từ bán kính; vệ tinh giả định là đá 3 g/cm³; công thức ở mục 7.9.
+
+**b) Định thời từng transit** (`scripts/04_moons.py:122`):
+1. Dựng **mẫu transit** bằng batman (thông số từ bước 2) trên 4.001 điểm trong ±(1.5 × T14 + 0.1 ngày).
+2. Với mỗi vòng n: thử 401 độ dịch trong ±max(0.5 × T14, 3 × 29.4 phút), tính χ² giữa dữ liệu và mẫu đã dịch, chọn độ dịch χ² nhỏ nhất.
+3. **Bỏ transit** nếu: có ít hơn 60% số điểm dự kiến trong transit, thiếu ingress hoặc egress (< 15% số điểm dự kiến ở mỗi sườn), hoặc cực tiểu χ² nằm ở mép khoảng dịch.
+4. **Độ nhiễu** dùng cho χ² = độ lệch chuẩn thật của các điểm ngoài transit quanh đó (không nhỏ hơn sai số pipeline), vì sai số pipeline thường bị đánh giá thấp.
+5. **Sai số thời điểm**: nửa bề rộng vùng có χ² ≤ χ²_min + 1.
+
+**c) O − C** (`scripts/04_moons.py:156`): khớp đường thẳng $t_c = T_0 + nP$ có trọng số 1/σ², loại transit lệch > max(5 × MAD, 3σ) rồi khớp lại, tối đa 5 lần.
+
+**d) Kiểm định TTV** theo thứ tự:
+
+| Phép thử | Điều kiện chạy | Cách làm |
+|---|---|---|
+| Lomb–Scargle | ≥ 8 transit | Tần số từ 1/(số vòng) tới 0.5 vòng⁻¹, đọc chu kỳ mạnh nhất và FAP |
+| Chia đôi dữ liệu | ≥ 16 transit | Chạy Lomb–Scargle riêng nửa đầu và nửa sau; tín hiệu thật phải cho cùng chu kỳ (lệch < 5%) ở cả hai nửa |
+| Họa âm chu kỳ phách | Đủ vòng để phân giải (1/số vòng ≤ 0.005) | Có trùng bậc k = 1–15 của frac(P/29.4244 phút) không, sau khi gập tần số về ≤ 0.5 |
+| Lệch theo lưới đo | ≥ 15 transit | Chia transit thành 5 nhóm theo vị trí tâm trong khoảng 29.4 phút, so O − C trung bình các nhóm bằng χ², ra p-value |
+
+Kết luận (`scripts/04_moons.py:262`): FAP ≥ 0.001 → không thấy TTV. FAP < 0.001 thì lần lượt: trùng họa âm hoặc lệch theo lưới đo (p < 0.001) → **lỗi đo**; không lặp lại ở cả hai nửa → **nhiễu**; qua hết → cảnh báo cần loại trừ hành tinh khác, vết đen trước khi nghĩ tới vệ tinh.
+
+**e) Giới hạn khối lượng từ TTV**: dùng **O − C rms đo được** làm σ_TTV (thận trọng: tín hiệu vệ tinh không thể lớn hơn toàn bộ độ tán xạ thấy được), vệ tinh đặt ở a_max.
+
+**f) Giới hạn bán kính từ OSE** (`scripts/04_moons.py:217`), đơn vị thời gian tính từ tâm transit:
+
+| Vùng | Từ | Tới |
+|---|---|---|
+| Vai (nơi vệ tinh có thể ở) | 0.6 × T14 + 29.4 phút | Δt_max + T14/2 |
+| Nền (để so sánh) | Mép ngoài vùng vai + T14/2 | + max(2 × Δt_max, 1 ngày), không quá P/2 |
+
+Cần ≥ 10 điểm mỗi vùng; nếu vùng vai nằm gọn trong transit hành tinh thì bỏ qua OSE. Biên dạng xuất CSV/vẽ hình chia 120 bin, mỗi bin ≥ 5 điểm.
+
+### 9.6. Giả định chung và giới hạn của code
+
+| Giả định | Ở đâu | Ảnh hưởng |
+|---|---|---|
+| Quỹ đạo tròn (e = 0) | Mô hình batman, công thức T14, ρ* | Hành tinh lệch tâm làm ρ* và Ms suy từ transit sai |
+| Tối rìa cố định u = (0.40, 0.26), giá trị cho **sao loại G** | `LIMB_DARKENING` | Với sao lùn M (Kepler-186) hay sao nóng, hình dạng transit, k và b lệch một chút. Chuẩn hơn là tra bảng Claret theo Teff, logg |
+| Bán kính sao lấy từ KIC | Header FITS | Sai số Rs truyền thẳng vào Rp (Kepler-6b lệch 10%, mục 8.3) |
+| Albedo 0.3 | Teq | Teq chỉ là ước lượng |
+| Nhiễu trắng | BLS, χ², OSE | Nhiễu đỏ làm SNR và giới hạn thực tế kém hơn con số in ra |
+| Sai số chỉ từ ma trận hiệp phương sai | `curve_fit` | Thường nhỏ hơn thực tế; phân tích chuyên nghiệp dùng MCMC |
+| Ngưỡng và cửa sổ (SDE 9, SNR 10, cửa sổ làm phẳng 18 ngày, thời lượng BLS ≤ 0.6 ngày…) | Hằng số đầu mỗi file | Được chỉnh trên 4 hệ đã làm; hệ khác (transit rất dài, sao biến quang mạnh) có thể cần chỉnh |
+| Chỉ dữ liệu Kepler long cadence | `author="Kepler", cadence="long"` | Không dùng short cadence 1 phút (định thời TTV tốt hơn nhiều) và không dùng K2/TESS |
